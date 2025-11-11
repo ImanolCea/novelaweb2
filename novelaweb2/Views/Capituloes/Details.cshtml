@@ -46,7 +46,7 @@
                         <small class="ms-2">@c.Fecha.ToString("g")</small>
                         <p class="mt-2">@c.Contenido</p>
 
-                        @if (Context.Session.GetInt32("UsuarioId") == c.UsuarioId)
+                        @if (ViewContext.HttpContext.Session.GetInt32("UsuarioId") == c.UsuarioId)
                         {
                             <form asp-action="Delete" asp-controller="Comentarios" method="post" class="d-inline">
                                 <input type="hidden" name="id" value="@c.Id" />
@@ -62,7 +62,7 @@
             <p>No hay comentarios aún. Sé el primero en opinar.</p>
         }
 
-        @if (Context.Session.GetInt32("UsuarioId") != null)
+        @if (ViewContext.HttpContext.Session.GetInt32("UsuarioId") != null)
         {
             <form asp-action="Create" asp-controller="Comentarios" method="post" class="mt-4">
                 <input type="hidden" name="capituloId" value="@Model.Id" />

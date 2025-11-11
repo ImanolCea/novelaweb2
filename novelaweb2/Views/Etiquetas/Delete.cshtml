@@ -1,27 +1,30 @@
 ﻿@model novelaweb2.Models.Etiqueta
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Eliminar etiqueta";
 }
 
-<h1>Delete</h1>
+<div class="admin-page">
+    <div class="admin-header">
+        <div>
+            <h1 class="admin-title text-danger">Eliminar etiqueta</h1>
+            <p class="admin-subtitle">Confirma si deseas eliminar esta etiqueta. La acción no se puede deshacer.</p>
+        </div>
+        <a class="btn btn-outline-light" asp-action="Index"><i class="fa-solid fa-arrow-left me-2"></i>Cancelar</a>
+    </div>
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>Etiqueta</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Nombre)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Nombre)
-        </dd>
-    </dl>
-    
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
-    </form>
+    <div class="admin-card">
+        <dl class="row mb-4">
+            <dt class="col-sm-3 text-uppercase text-muted">Nombre</dt>
+            <dd class="col-sm-9 text-white">@Model?.Nombre</dd>
+        </dl>
+
+        <form asp-action="Delete" class="d-flex gap-2">
+            <input type="hidden" asp-for="Id" />
+            <button type="submit" class="btn btn-danger">
+                <i class="fa-solid fa-trash me-2"></i>Eliminar etiqueta
+            </button>
+            <a class="btn btn-outline-light" asp-action="Index">Conservar</a>
+        </form>
+    </div>
 </div>

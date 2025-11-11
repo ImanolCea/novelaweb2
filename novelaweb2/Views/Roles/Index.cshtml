@@ -1,35 +1,58 @@
 ﻿@model IEnumerable<novelaweb2.Models.Role>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Roles";
 }
 
-<h1>Index</h1>
+<div class="admin-page">
+    <div class="admin-header">
+        <div>
+            <h1 class="admin-title">Gestión de roles</h1>
+            <p class="admin-subtitle">Administra los permisos disponibles para los usuarios de la plataforma.</p>
+        </div>
+        <a class="btn btn-primary" asp-action="Create"><i class="fa-solid fa-plus me-2"></i>Nuevo rol</a>
+    </div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Nombre)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Nombre)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+    <div class="admin-card">
+        <div class="table-responsive">
+            <table class="table table-hover table-borderless align-middle admin-table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th class="text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="2" class="text-center text-muted py-4">No se han creado roles todavía.</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="fw-semibold text-white">@item.Nombre</td>
+                                <td>
+                                    <div class="admin-actions justify-content-end">
+                                        <a class="btn btn-sm btn-outline-light" asp-action="Details" asp-route-id="@item.Id">
+                                            <i class="fa-solid fa-circle-info me-1"></i>Detalles
+                                        </a>
+                                        <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@item.Id">
+                                            <i class="fa-solid fa-pen-to-square me-1"></i>Editar
+                                        </a>
+                                        <a class="btn btn-sm btn-outline-danger" asp-action="Delete" asp-route-id="@item.Id">
+                                            <i class="fa-solid fa-trash me-1"></i>Eliminar
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

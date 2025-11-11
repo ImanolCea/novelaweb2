@@ -3,7 +3,7 @@
 
 @{
     ViewData["Title"] = Model.Titulo;
-    var usuarioId = Context.Session.GetInt32("UsuarioId");
+    var usuarioId = ViewContext.HttpContext.Session.GetInt32("UsuarioId");
     bool esAutor = usuarioId == Model.AutorId;
     var seguimiento = Model.Seguimientos?.FirstOrDefault(s => s.UsuarioId == usuarioId);
 }

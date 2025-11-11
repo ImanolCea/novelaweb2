@@ -1,37 +1,92 @@
-﻿@model IEnumerable<novelaweb2.Models.Novela>
+@model IEnumerable<novelaweb2.Models.Novela>
 @{
-    ViewData["Title"] = "Mis Libros";
+    ViewData["Title"] = "Series";
+    var search = ViewBag.Search as string;
+    int? etiquetaSeleccionada = ViewBag.EtiquetaId as int?;
+    var etiquetas = ViewBag.Etiquetas as IEnumerable<novelaweb2.Models.Etiqueta> ?? Enumerable.Empty<novelaweb2.Models.Etiqueta>();
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+    var rolSesion = ViewContext.HttpContext.Session.GetString("Rol");
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="text-light">Mis Libros</h2>
-    <a asp-action="Create" class="btn btn-primary"><i class="fa-solid fa-plus me-2"></i> Crear nueva novela</a>
+<div class="admin-header mb-4">
+    <div>
+        <h1 class="admin-title">Explora series</h1>
+        <p class="admin-subtitle">Navega por todas las novelas disponibles, filtra por etiquetas y descubre nuevas historias.</p>
+    </div>
+    @if (string.Equals(rolSesion, "Administrador", StringComparison.OrdinalIgnoreCase))
+    {
+        <a asp-action="Create" class="btn btn-primary"><i class="fa-solid fa-plus me-2"></i>Nueva novela</a>
+    }
+</div>
+
+<div class="admin-card mb-4">
+    <form method="get" class="row g-3 align-items-end">
+        <div class="col-lg-6">
+            <label class="form-label text-uppercase small">Buscar</label>
+            <input type="search" name="search" value="@search" class="form-control" placeholder="Título, autor o sinopsis" />
+        </div>
+        <div class="col-lg-4">
+            <label class="form-label text-uppercase small">Etiqueta</label>
+            <select name="etiquetaId" class="form-select">
+                <option value="">Todas</option>
+                @foreach (var etiqueta in etiquetas)
+                {
+                    <option value="@etiqueta.Id" selected="@(etiquetaSeleccionada == etiqueta.Id ? "selected" : null)">@etiqueta.Nombre</option>
+                }
+            </select>
+        </div>
+        <div class="col-lg-2 d-flex gap-2">
+            <button type="submit" class="btn btn-primary flex-fill"><i class="fa-solid fa-magnifying-glass me-2"></i>Filtrar</button>
+            <a asp-action="Index" class="btn btn-outline-light flex-fill">Limpiar</a>
+        </div>
+    </form>
 </div>
 
 @if (!Model.Any())
 {
-    <div class="alert bg-dark text-light border-secondary">No tienes novelas todavía.</div>
+    <div class="alert bg-dark text-light border-secondary">No encontramos novelas con los criterios indicados.</div>
 }
 else
 {
-    <div class="row g-4">
+    <div class="grid">
         @foreach (var novela in Model)
         {
-            <div class="col-md-4">
-                <div class="card novela-card h-100">
-                    <img src="@(novela.PortadaUrl ?? "/img/default-cover.jpg")" class="card-img-top" alt="@novela.Titulo" style="height:280px;object-fit:cover">
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title text-light">@novela.Titulo</h5>
-                        <p class="text-muted mb-2">@novela.Genero</p>
-                        <p class="text-muted small flex-grow-1">
-                            @(
-                                                string.IsNullOrEmpty(novela.Sinopsis) ? "—" : (novela.Sinopsis.Length > 140 ? novela.Sinopsis.Substring(0, 140) + "..." : novela.Sinopsis)
-                                                )
-                    </p>
-                    <a asp-action="Details" asp-route-id="@novela.Id" class="btn btn-outline-primary mt-2">Ver detalles</a>
+            <div class="card-novel">
+                <img src="@(!string.IsNullOrWhiteSpace(novela.PortadaUrl) ? novela.PortadaUrl : Url.Content("~/img/default-cover.svg"))" alt="Portada de @novela.Titulo" class="thumb" />
+                <div class="meta text-start">
+                    <h5>@novela.Titulo</h5>
+                    <p class="text-muted small mb-2">@novela.Autor?.NombreUsuario ?? "Autor desconocido"</p>
+                    <p class="text-muted small mb-3">@((string.IsNullOrWhiteSpace(novela.Sinopsis) ? "Sin sinopsis" : (novela.Sinopsis!.Length > 120 ? novela.Sinopsis.Substring(0, 120) + "…" : novela.Sinopsis)))</p>
+                    <div class="mb-3">
+                        @foreach (var tag in novela.EtiquetaNovelas.Select(en => en.Etiqueta).Where(e => e != null))
+                        {
+                            <span class="badge-tag">@tag!.Nombre</span>
+                        }
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a asp-action="Details" asp-route-id="@novela.Id" class="btn btn-sm btn-outline-primary">Detalles</a>
+                        @if (string.Equals(rolSesion, "Administrador", StringComparison.OrdinalIgnoreCase))
+                        {
+                            <div class="admin-actions">
+                                <a asp-action="Edit" asp-route-id="@novela.Id" class="btn btn-sm btn-outline-light">Editar</a>
+                                <a asp-action="Delete" asp-route-id="@novela.Id" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                            </div>
+                        }
+                    </div>
                 </div>
             </div>
-        </div>
         }
     </div>
+
+    <nav aria-label="Paginación de novelas" class="mt-4">
+        <ul class="pagination justify-content-center gap-2 flex-wrap">
+            @for (var pageNumber = 1; pageNumber <= totalPages; pageNumber++)
+            {
+                <li class="page-item @(pageNumber == currentPage ? "active" : string.Empty)">
+                    <a class="page-link" asp-action="Index" asp-route-page="@pageNumber" asp-route-search="@search" asp-route-etiquetaId="@etiquetaSeleccionada">@pageNumber</a>
+                </li>
+            }
+        </ul>
+    </nav>
 }

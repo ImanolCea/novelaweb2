@@ -1,6 +1,6 @@
-﻿namespace novelaweb2.Models;
+namespace novelaweb2.Models;
 
-public class NovelaEtiquetas
+public class EtiquetaNovela
 {
     public int NovelaId { get; set; }
     public int EtiquetaId { get; set; }

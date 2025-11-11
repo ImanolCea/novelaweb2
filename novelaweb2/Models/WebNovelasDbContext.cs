@@ -20,6 +20,7 @@ public partial class WebNovelasDbContext : DbContext
     public virtual DbSet<Comentario> Comentarios { get; set; }
 
     public virtual DbSet<Etiqueta> Etiquetas { get; set; }
+    public virtual DbSet<EtiquetaNovela> EtiquetaNovelas { get; set; }
 
     public virtual DbSet<Lista> Listas { get; set; }
 
@@ -170,24 +171,25 @@ public partial class WebNovelasDbContext : DbContext
                 .HasForeignKey(d => d.AutorId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Novelas_Usuarios");
+        });
 
-            entity.HasMany(d => d.Etiqueta).WithMany(p => p.Novelas)
-                .UsingEntity<Dictionary<string, object>>(
-                    "NovelaEtiqueta",
-                    r => r.HasOne<Etiqueta>().WithMany()
-                        .HasForeignKey("EtiquetaId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("FK_NovelaEtiquetas_Etiquetas"),
-                    l => l.HasOne<Novela>().WithMany()
-                        .HasForeignKey("NovelaId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("FK_NovelaEtiquetas_Novelas"),
-                    j =>
-                    {
-                        j.HasKey("NovelaId", "EtiquetaId");
-                        j.ToTable("NovelaEtiquetas");
-                        j.HasIndex(new[] { "NovelaId" }, "IX_NovelaEtiquetas_NovelaId");
-                    });
+        modelBuilder.Entity<EtiquetaNovela>(entity =>
+        {
+            entity.HasKey(e => new { e.NovelaId, e.EtiquetaId });
+
+            entity.HasIndex(e => e.EtiquetaId, "IX_NovelaEtiquetas_EtiquetaId");
+
+            entity.ToTable("NovelaEtiquetas");
+
+            entity.HasOne(d => d.Novela).WithMany(p => p.EtiquetaNovelas)
+                .HasForeignKey(d => d.NovelaId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_NovelaEtiquetas_Novelas");
+
+            entity.HasOne(d => d.Etiqueta).WithMany(p => p.NovelaEtiquetas)
+                .HasForeignKey(d => d.EtiquetaId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_NovelaEtiquetas_Etiquetas");
         });
 
         modelBuilder.Entity<Reseña>(entity =>
