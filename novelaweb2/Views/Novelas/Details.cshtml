@@ -3,9 +3,12 @@
 
 @{
     ViewData["Title"] = Model.Titulo;
-    var usuarioId = Context.Session.GetInt32("UsuarioId");
-    bool esAutor = usuarioId == Model.AutorId;
-    var seguimiento = Model.Seguimientos?.FirstOrDefault(s => s.UsuarioId == usuarioId);
+    var session = ViewContext.HttpContext?.Session;
+    var usuarioId = session?.GetInt32("UsuarioId");
+    bool esAutor = usuarioId.HasValue && usuarioId.Value == Model.AutorId;
+    var seguimiento = usuarioId.HasValue
+        ? Model.Seguimientos?.FirstOrDefault(s => s.UsuarioId == usuarioId.Value)
+        : null;
 }
 
 <div class="container py-4 text-light">
@@ -34,7 +37,7 @@
             }
 
             <!-- Botones de seguimiento -->
-            @if (usuarioId != null && !esAutor)
+            @if (usuarioId.HasValue && !esAutor)
             {
                 <div class="d-flex gap-2 flex-wrap">
                     <form method="post" asp-controller="Seguimientoes" asp-action="@(seguimiento == null ? "Seguir" : "DejarSeguir")">
@@ -137,7 +140,7 @@
                                 <p class="mt-2">@r.Comentario</p>
                                 <small style="color:#888;">@r.Fecha.ToString("dd MMM yyyy")</small>
 
-                                @if (usuarioId == r.UsuarioId)
+                                @if (usuarioId.HasValue && usuarioId.Value == r.UsuarioId)
                                 {
                                     <form asp-controller="Reseña" asp-action="Delete" method="post" class="mt-2">
                                         <input type="hidden" name="id" value="@r.Id" />
@@ -158,14 +161,14 @@
                 }
 
                 <!-- ===== FORMULARIO DE NUEVA RESEÑA ===== -->
-                @if (usuarioId != null && !esAutor)
+                @if (usuarioId.HasValue && !esAutor)
                 {
                     <div class="card bg-dark border-secondary mt-4">
                         <div class="card-body">
                             <h5 class="text-light opacity-75 mb-3">Escribe una reseña</h5>
                             <form asp-controller="Reseña" asp-action="Create" method="post">
                                 <input type="hidden" name="novelaId" value="@Model.Id" />
-                                <input type="hidden" name="usuarioId" value="@usuarioId" />
+                                <input type="hidden" name="usuarioId" value="@usuarioId.Value" />
                                 <div class="mb-3">
                                     <label class="text-light opacity-75">Puntuación</label>
                                     <select class="form-select form-control-dark" name="puntuacion" required>
@@ -185,7 +188,7 @@
                         </div>
                     </div>
                 }
-                else if (usuarioId == null)
+                else if (!usuarioId.HasValue)
                 {
                     <div class="mt-4 text-center">
                         <p>Inicia sesión para dejar una reseña.</p>

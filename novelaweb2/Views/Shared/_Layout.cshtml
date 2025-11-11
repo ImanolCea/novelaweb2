@@ -1,5 +1,8 @@
-﻿@{
+﻿@using Microsoft.AspNetCore.Http
+@{
     Layout = null;
+    var session = ViewContext.HttpContext?.Session;
+    var usuarioNombre = session?.GetString("UsuarioNombre");
 }
 <!DOCTYPE html>
 <html lang="es">
@@ -61,10 +64,6 @@
                             <input class="form-control search-input" type="search" placeholder="Buscar..." aria-label="Buscar">
                         </div>
 
-                        @{
-                            var usuarioNombre = Context.Session.GetString("UsuarioNombre");
-                        }
-
                         @if (string.IsNullOrEmpty(usuarioNombre))
                         {
                             <!-- Si no hay sesión, mostrar botones de login/registro -->
@@ -85,7 +84,7 @@
                                     <span>@usuarioNombre</span>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark">
-                                    <li><a class="dropdown-item" asp-controller="Usuarios" asp-action="Details" asp-route-id="@Context.Session.GetInt32("UsuarioId")">Mis datos</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Usuarios" asp-action="Details" asp-route-id="@session?.GetInt32("UsuarioId")">Mis datos</a></li>
                                     <li><a class="dropdown-item" asp-controller="Listas" asp-action="Index">Mis listas</a></li>
                                     <li><a class="dropdown-item" asp-controller="Novelas" asp-action="Index">Mis libros</a></li>
                                     <li><hr class="dropdown-divider" /></li>
