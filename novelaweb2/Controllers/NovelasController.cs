@@ -14,7 +14,7 @@ namespace novelaweb2.Controllers
             _context = context;
         }
 
-        // GET: Novelas/Details/5
+        // GET: Novelas/Details/5a
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
