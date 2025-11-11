@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using novelaweb2.Infrastructure;
 using novelaweb2.Models;
 
 namespace novelaweb2.Controllers
 {
+    [AdminAuthorize]
     public class EtiquetasController : Controller
     {
         private readonly WebNovelasDbContext _context;

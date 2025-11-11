@@ -1,69 +1,36 @@
-﻿@model novelaweb2.Models.Novela
+@model novelaweb2.Models.Novela
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Eliminar novela";
 }
 
-<h1>Delete</h1>
+<div class="admin-page">
+    <div class="admin-header">
+        <div>
+            <h1 class="admin-title text-danger">Eliminar novela</h1>
+            <p class="admin-subtitle">Confirma si deseas eliminar esta serie y todo su contenido asociado.</p>
+        </div>
+        <a class="btn btn-outline-light" asp-action="Index"><i class="fa-solid fa-arrow-left me-2"></i>Cancelar</a>
+    </div>
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>Novela</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Titulo)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Titulo)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Sinopsis)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Sinopsis)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PortadaUrl)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PortadaUrl)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Estado)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Estado)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FechaPublicacion)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FechaPublicacion)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PalabrasTotales)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PalabrasTotales)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Genero)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Genero)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Autor)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Autor.Id)
-        </dd>
-    </dl>
-    
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
-    </form>
+    <div class="admin-card">
+        <dl class="row mb-4">
+            <dt class="col-sm-3 text-uppercase text-muted">Título</dt>
+            <dd class="col-sm-9 text-white">@Model?.Titulo</dd>
+
+            <dt class="col-sm-3 text-uppercase text-muted">Autor</dt>
+            <dd class="col-sm-9">@Model?.Autor?.NombreUsuario</dd>
+
+            <dt class="col-sm-3 text-uppercase text-muted">Estado</dt>
+            <dd class="col-sm-9">@Model?.Estado</dd>
+        </dl>
+
+        <form asp-action="Delete" class="d-flex gap-2">
+            <input type="hidden" asp-for="Id" />
+            <button type="submit" class="btn btn-danger">
+                <i class="fa-solid fa-trash me-2"></i>Eliminar novela
+            </button>
+            <a class="btn btn-outline-light" asp-action="Index">Conservar</a>
+        </form>
+    </div>
 </div>

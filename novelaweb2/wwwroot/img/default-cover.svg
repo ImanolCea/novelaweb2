@@ -1,0 +1,6 @@
+<svg width="600" height="900" viewBox="0 0 600 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="600" height="900" rx="24" fill="#1e1e1e"/>
+  <rect x="50" y="50" width="500" height="800" rx="20" fill="#262626" stroke="#2f2f2f" stroke-width="4" stroke-dasharray="12 12"/>
+  <text x="50%" y="45%" dominant-baseline="middle" text-anchor="middle" fill="#4a90e2" font-size="48" font-family="'Inter', Arial, sans-serif">NovelaWeb</text>
+  <text x="50%" y="58%" dominant-baseline="middle" text-anchor="middle" fill="#9b9b9b" font-size="24" font-family="'Inter', Arial, sans-serif">Sin portada</text>
+</svg>

@@ -5,10 +5,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using novelaweb2.Infrastructure;
 using novelaweb2.Models;
 
 namespace novelaweb2.Controllers
 {
+    [AdminAuthorize]
     public class UsuariosController : Controller
     {
         private readonly WebNovelasDbContext _context;

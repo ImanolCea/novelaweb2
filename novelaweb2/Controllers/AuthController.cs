@@ -35,20 +35,33 @@ namespace novelaweb2.Controllers
                 return View();
             }
 
+            var rolUsuario = await _context.Roles.FirstOrDefaultAsync(r => r.Nombre == "Usuario");
+            if (rolUsuario == null)
+            {
+                rolUsuario = new Role { Nombre = "Usuario" };
+                _context.Roles.Add(rolUsuario);
+                await _context.SaveChangesAsync();
+            }
+
             var nuevoUsuario = new Usuario
             {
                 NombreUsuario = nombreUsuario,
                 Correo = correo,
                 Contrasena = HashPassword(contrasena),
                 FechaRegistro = DateTime.Now,
-                RolId = 2 // asegúrate que exista rol con Id = 2 (usuario)
+                RolId = rolUsuario.Id,
+                Rol = rolUsuario
             };
 
             _context.Usuarios.Add(nuevoUsuario);
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = "Registro exitoso. Ahora inicia sesión.";
-            return RedirectToAction("Login");
+            HttpContext.Session.SetString("UsuarioNombre", nuevoUsuario.NombreUsuario);
+            HttpContext.Session.SetInt32("UsuarioId", nuevoUsuario.Id);
+            HttpContext.Session.SetString("Rol", rolUsuario.Nombre);
+
+            TempData["Success"] = "Registro exitoso. ¡Bienvenido a NovelaWeb!";
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpGet]
@@ -78,7 +91,7 @@ namespace novelaweb2.Controllers
             HttpContext.Session.SetInt32("UsuarioId", usuario.Id);
             HttpContext.Session.SetString("Rol", usuario.Rol?.Nombre ?? "User");
 
-            return RedirectToAction("Index", "Novelas");
+            return RedirectToAction("Index", "Home");
         }
 
         public IActionResult Logout()

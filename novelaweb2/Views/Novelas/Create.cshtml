@@ -1,92 +1,77 @@
-﻿@{
-    ViewData["Title"] = "Crear nueva novela";
+@using Microsoft.AspNetCore.Mvc.Rendering
+@model novelaweb2.Models.Novela
+
+@{
+    ViewData["Title"] = "Crear novela";
+    var etiquetas = ViewData["Etiquetas"] as MultiSelectList ?? new MultiSelectList(Enumerable.Empty<object>());
+    var autores = ViewData["Autores"] as SelectList ?? new SelectList(Enumerable.Empty<object>());
 }
 
-<div class="novela-create-container">
-    <div class="card bg-dark text-light p-4 shadow-lg border-0 rounded-4">
-        <h2 class="mb-4 text-center"><i class="fa-solid fa-book-open me-2 text-primary"></i> Crear Nueva Novela</h2>
+<div class="admin-page">
+    <div class="admin-header">
+        <div>
+            <h1 class="admin-title">Nueva novela</h1>
+            <p class="admin-subtitle">Completa la información para publicar una nueva serie en la plataforma.</p>
+        </div>
+        <a class="btn btn-outline-light" asp-action="Index"><i class="fa-solid fa-arrow-left me-2"></i>Volver</a>
+    </div>
 
-        @if (ViewBag.Error != null)
-        {
-            <div class="alert alert-danger">@ViewBag.Error</div>
-        }
-
-        <form asp-action="Create" method="post">
-            <!-- Datos de la novela -->
-            <div class="mb-4">
-                <h5 class="border-bottom border-secondary pb-2 mb-3 text-uppercase text-muted">Información de la novela</h5>
-
-                <div class="mb-3">
-                    <label class="form-label">Título *</label>
-                    <input name="titulo" class="form-control form-control-dark" required />
+    <div class="admin-card">
+        <form asp-action="Create" method="post" class="admin-form">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            <div class="row g-4">
+                <div class="col-md-8">
+                    <label asp-for="Titulo" class="form-label"></label>
+                    <input asp-for="Titulo" class="form-control" placeholder="Título de la novela" />
+                    <span asp-validation-for="Titulo" class="text-danger"></span>
                 </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Sinopsis</label>
-                    <textarea name="sinopsis" rows="3" class="form-control form-control-dark"></textarea>
+                <div class="col-md-4">
+                    <label asp-for="AutorId" class="form-label">Autor</label>
+                    <select asp-for="AutorId" class="form-select" asp-items="autores"></select>
+                    <span asp-validation-for="AutorId" class="text-danger"></span>
                 </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Portada (URL de imagen)</label>
-                    <input name="portadaUrl" class="form-control form-control-dark" placeholder="https://..." />
+                <div class="col-md-12">
+                    <label asp-for="Sinopsis" class="form-label"></label>
+                    <textarea asp-for="Sinopsis" class="form-control" rows="4" placeholder="Describe brevemente la trama"></textarea>
+                    <span asp-validation-for="Sinopsis" class="text-danger"></span>
                 </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Género</label>
-                    <select name="genero" class="form-select form-control-dark">
-                        <option value="">Selecciona un género</option>
-                        <option value="Acción">Acción</option>
-                        <option value="Aventura">Aventura</option>
-                        <option value="Romance">Romance</option>
-                        <option value="Fantasía">Fantasía</option>
-                        <option value="Ciencia Ficción">Ciencia Ficción</option>
-                        <option value="Comedia">Comedia</option>
-                        <option value="Drama">Drama</option>
-                        <option value="Misterio">Misterio</option>
+                <div class="col-md-4">
+                    <label asp-for="PortadaUrl" class="form-label"></label>
+                    <input asp-for="PortadaUrl" class="form-control" placeholder="https://..." />
+                    <span asp-validation-for="PortadaUrl" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Genero" class="form-label"></label>
+                    <input asp-for="Genero" class="form-control" placeholder="Ej. Fantasía" />
+                    <span asp-validation-for="Genero" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Estado" class="form-label"></label>
+                    <select asp-for="Estado" class="form-select">
+                        <option value="En curso">En curso</option>
+                        <option value="Finalizada">Finalizada</option>
+                        <option value="Hiato">Hiato</option>
                     </select>
+                    <span asp-validation-for="Estado" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="PalabrasTotales" class="form-label"></label>
+                    <input asp-for="PalabrasTotales" class="form-control" type="number" min="0" />
+                    <span asp-validation-for="PalabrasTotales" class="text-danger"></span>
+                </div>
+                <div class="col-md-8">
+                    <label class="form-label">Etiquetas</label>
+                    <select class="form-select" name="etiquetasSeleccionadas" asp-items="etiquetas" multiple size="5"></select>
+                    <small class="text-muted">Mantén presionada la tecla Ctrl (Cmd en Mac) para seleccionar varias opciones.</small>
                 </div>
             </div>
-
-            <!-- Primer capítulo -->
-            <div class="mb-4">
-                <h5 class="border-bottom border-secondary pb-2 mb-3 text-uppercase text-muted">
-                    Primer capítulo
-                </h5>
-
-                <div class="mb-3">
-                    <label class="form-label">Título del capítulo *</label>
-                    <input name="capituloTitulo" class="form-control form-control-dark" required />
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Contenido *</label>
-                    <textarea name="capituloContenido" rows="10" class="form-control form-control-dark" required></textarea>
-                    <small class="text-muted">Introduce al menos unas pocas líneas para iniciar la novela.</small>
-                </div>
-            </div>
-
-            <!-- Botón -->
-            <div class="text-center mt-4">
-                <button type="submit" class="btn btn-primary px-5 py-2">
-                    <i class="fa-solid fa-cloud-arrow-up me-2"></i> Publicar novela y capítulo
-                </button>
-            </div>
+            <button type="submit" class="btn btn-primary mt-4">
+                <i class="fa-solid fa-floppy-disk me-2"></i>Publicar novela
+            </button>
         </form>
     </div>
 </div>
 
 @section Scripts {
-    <script>
-        // Contador de palabras en tiempo real
-        const textarea = document.querySelector('textarea[name="capituloContenido"]');
-        if (textarea) {
-            const counter = document.createElement('small');
-            counter.classList.add('text-muted', 'd-block', 'mt-1');
-            textarea.parentElement.appendChild(counter);
-            textarea.addEventListener('input', () => {
-                const count = textarea.value.trim().split(/\s+/).filter(w => w.length).length;
-                counter.textContent = `${count} palabras`;
-            });
-        }
-    </script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

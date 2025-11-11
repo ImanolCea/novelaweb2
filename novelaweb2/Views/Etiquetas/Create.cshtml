@@ -1,31 +1,31 @@
 ﻿@model novelaweb2.Models.Etiqueta
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Crear etiqueta";
 }
 
-<h1>Create</h1>
+<div class="admin-page">
+    <div class="admin-header">
+        <div>
+            <h1 class="admin-title">Nueva etiqueta</h1>
+            <p class="admin-subtitle">Crea etiquetas para ayudar a los lectores a descubrir novelas.</p>
+        </div>
+        <a class="btn btn-outline-light" asp-action="Index"><i class="fa-solid fa-arrow-left me-2"></i>Volver</a>
+    </div>
 
-<h4>Etiqueta</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Nombre" class="control-label"></label>
-                <input asp-for="Nombre" class="form-control" />
+    <div class="admin-card">
+        <form asp-action="Create" class="admin-form">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            <div class="mb-3">
+                <label asp-for="Nombre" class="form-label"></label>
+                <input asp-for="Nombre" class="form-control" placeholder="Ej. Fantasía" />
                 <span asp-validation-for="Nombre" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-floppy-disk me-2"></i>Guardar etiqueta
+            </button>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {

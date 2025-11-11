@@ -41,19 +41,25 @@
                         <li class="nav-item"><a class="nav-link" asp-controller="Novelas" asp-action="Index">Series</a></li>
                         <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Privacy">Privacidad</a></li>
               
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="resourcesDropdown" role="button"
-                               data-bs-toggle="dropdown" aria-expanded="false">
-                                Administracion
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="resourcesDropdown">
-                                
-                                <li class="nav-item"><a class="nav-link" asp-controller="Roles" asp-action="Index">Roles</a></li>
-                                <li class="nav-item"><a class="nav-link" asp-controller="usuarios" asp-action="Index">Usuarios</a></li>
-                                <li class="nav-item"><a class="nav-link" asp-controller="Etiquetas" asp-action="Index">Etiquetas</a></li>
-                                <li class="nav-item"><a class="nav-link" asp-controller="Novelas" asp-action="Index">Novelas</a></li>
-                            </ul>
-                        </li>
+                        @{
+                            var usuarioRol = Context.Session.GetString("Rol");
+                        }
+
+                        @if (string.Equals(usuarioRol, "Administrador", StringComparison.OrdinalIgnoreCase))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="resourcesDropdown" role="button"
+                                   data-bs-toggle="dropdown" aria-expanded="false">
+                                    Administracion
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="resourcesDropdown">
+                                    <li class="nav-item"><a class="nav-link" asp-controller="Roles" asp-action="Index">Roles</a></li>
+                                    <li class="nav-item"><a class="nav-link" asp-controller="Usuarios" asp-action="Index">Usuarios</a></li>
+                                    <li class="nav-item"><a class="nav-link" asp-controller="Etiquetas" asp-action="Index">Etiquetas</a></li>
+                                    <li class="nav-item"><a class="nav-link" asp-controller="Novelas" asp-action="Index">Novelas</a></li>
+                                </ul>
+                            </li>
+                        }
                     </ul>
 
                     <form class="d-flex align-items-center header-actions" role="search" onsubmit="return false;">

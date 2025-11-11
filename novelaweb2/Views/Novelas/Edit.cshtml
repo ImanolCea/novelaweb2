@@ -1,67 +1,75 @@
-﻿@model novelaweb2.Models.Novela
+@using Microsoft.AspNetCore.Mvc.Rendering
+@model novelaweb2.Models.Novela
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar novela";
+    var etiquetas = ViewData["Etiquetas"] as MultiSelectList ?? new MultiSelectList(Enumerable.Empty<object>());
+    var autores = ViewData["Autores"] as SelectList ?? new SelectList(Enumerable.Empty<object>());
 }
 
-<h1>Edit</h1>
+<div class="admin-page">
+    <div class="admin-header">
+        <div>
+            <h1 class="admin-title">Editar novela</h1>
+            <p class="admin-subtitle">Realiza ajustes en la información de la serie seleccionada.</p>
+        </div>
+        <a class="btn btn-outline-light" asp-action="Index"><i class="fa-solid fa-arrow-left me-2"></i>Volver</a>
+    </div>
 
-<h4>Novela</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="admin-card">
+        <form asp-action="Edit" method="post" class="admin-form">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
             <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="Titulo" class="control-label"></label>
-                <input asp-for="Titulo" class="form-control" />
-                <span asp-validation-for="Titulo" class="text-danger"></span>
+            <div class="row g-4">
+                <div class="col-md-8">
+                    <label asp-for="Titulo" class="form-label"></label>
+                    <input asp-for="Titulo" class="form-control" />
+                    <span asp-validation-for="Titulo" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="AutorId" class="form-label">Autor</label>
+                    <select asp-for="AutorId" class="form-select" asp-items="autores"></select>
+                    <span asp-validation-for="AutorId" class="text-danger"></span>
+                </div>
+                <div class="col-md-12">
+                    <label asp-for="Sinopsis" class="form-label"></label>
+                    <textarea asp-for="Sinopsis" class="form-control" rows="4"></textarea>
+                    <span asp-validation-for="Sinopsis" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="PortadaUrl" class="form-label"></label>
+                    <input asp-for="PortadaUrl" class="form-control" />
+                    <span asp-validation-for="PortadaUrl" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Genero" class="form-label"></label>
+                    <input asp-for="Genero" class="form-control" />
+                    <span asp-validation-for="Genero" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Estado" class="form-label"></label>
+                    <select asp-for="Estado" class="form-select">
+                        <option value="En curso">En curso</option>
+                        <option value="Finalizada">Finalizada</option>
+                        <option value="Hiato">Hiato</option>
+                    </select>
+                    <span asp-validation-for="Estado" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="PalabrasTotales" class="form-label"></label>
+                    <input asp-for="PalabrasTotales" class="form-control" type="number" min="0" />
+                    <span asp-validation-for="PalabrasTotales" class="text-danger"></span>
+                </div>
+                <div class="col-md-8">
+                    <label class="form-label">Etiquetas</label>
+                    <select class="form-select" name="etiquetasSeleccionadas" asp-items="etiquetas" multiple size="5"></select>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Sinopsis" class="control-label"></label>
-                <input asp-for="Sinopsis" class="form-control" />
-                <span asp-validation-for="Sinopsis" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PortadaUrl" class="control-label"></label>
-                <input asp-for="PortadaUrl" class="form-control" />
-                <span asp-validation-for="PortadaUrl" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Estado" class="control-label"></label>
-                <input asp-for="Estado" class="form-control" />
-                <span asp-validation-for="Estado" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="FechaPublicacion" class="control-label"></label>
-                <input asp-for="FechaPublicacion" class="form-control" />
-                <span asp-validation-for="FechaPublicacion" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="AutorId" class="control-label"></label>
-                <select asp-for="AutorId" class="form-control" asp-items="ViewBag.AutorId"></select>
-                <span asp-validation-for="AutorId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PalabrasTotales" class="control-label"></label>
-                <input asp-for="PalabrasTotales" class="form-control" />
-                <span asp-validation-for="PalabrasTotales" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Genero" class="control-label"></label>
-                <input asp-for="Genero" class="form-control" />
-                <span asp-validation-for="Genero" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
+            <button type="submit" class="btn btn-primary mt-4">
+                <i class="fa-solid fa-floppy-disk me-2"></i>Guardar cambios
+            </button>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {
