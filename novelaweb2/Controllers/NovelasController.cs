@@ -23,7 +23,7 @@ namespace novelaweb2.Controllers
                 .Include(n => n.Autor)
                 .Include(n => n.Capitulos)
                 .Include(n => n.Reseñas).ThenInclude(r => r.Usuario)
-                .Include(n => n.EtiquetaNovelas).ThenInclude(en => en.Etiqueta)
+                .Include(n => n.Etiqueta) // ✅ nombre correcto
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (novela == null) return NotFound();
@@ -52,19 +52,17 @@ namespace novelaweb2.Controllers
         {
             if (ModelState.IsValid)
             {
+                // Agregar etiquetas seleccionadas
+                if (etiquetasSeleccionadas != null && etiquetasSeleccionadas.Length > 0)
+                {
+                    novela.Etiqueta = await _context.Etiquetas
+                        .Where(e => etiquetasSeleccionadas.Contains(e.Id))
+                        .ToListAsync();
+                }
+
                 _context.Add(novela);
                 await _context.SaveChangesAsync();
 
-                foreach (var etId in etiquetasSeleccionadas)
-                {
-                    _context.EtiquetaNovelas.Add(new EtiquetaNovela
-                    {
-                        NovelaId = novela.Id,
-                        EtiquetaId = etId
-                    });
-                }
-
-                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Details), new { id = novela.Id });
             }
 
