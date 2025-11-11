@@ -1,0 +1,434 @@
+﻿/* ============================================================
+   🌙 site.css — Tema oscuro inspirado en WuxiaWorld
+   ============================================================ */
+
+/* ===== Variables ===== */
+:root {
+    --bg: #202020;
+    --bg-elev: #151515;
+    --panel: #2b2b2b;
+    --muted: #B6B6B6;
+    --heading: #FFFFFF;
+    --accent: #127afe;
+    --border: #3c3c3c;
+    --glass: rgba(255,255,255,0.03);
+    --radius: 10px;
+    --max-width: 1200px;
+    --font: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+/* ============================================================
+   🔹 BASE GENERAL
+   ============================================================ */
+html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--muted);
+    font-family: var(--font);
+    font-size: 16px;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+    color: var(--muted);
+    text-decoration: none;
+}
+
+    a:hover {
+        color: var(--accent);
+        text-decoration: none;
+    }
+
+.max-1200 {
+    max-width: var(--max-width);
+    margin: 0 auto;
+}
+
+/* ============================================================
+   🔹 HEADER / NAVBAR
+   ============================================================ */
+.site-header .navbar {
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0));
+    border-bottom: 1px solid var(--border);
+    padding-top: 0.6rem;
+    padding-bottom: 0.6rem;
+}
+
+.brand-icon {
+    color: var(--accent);
+}
+
+.brand-text {
+    color: var(--heading);
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    margin-left: 6px;
+    font-size: 1.05rem;
+}
+
+.navbar .nav-link {
+    color: var(--muted) !important;
+    font-weight: 600;
+    margin-right: 0.25rem;
+}
+
+    .navbar .nav-link:hover {
+        color: var(--accent) !important;
+    }
+
+/* 🔍 Búsqueda en header */
+.search-wrapper {
+    min-width: 180px;
+}
+
+.search-input {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 999px;
+    padding: .35rem .9rem;
+    transition: width .25s ease, border-color .2s;
+}
+
+    .search-input:focus {
+        outline: none;
+        box-shadow: 0 0 0 0.12rem rgba(18,122,254,0.12);
+        border-color: var(--accent);
+        width: 260px;
+        background: #232323;
+    }
+
+/* 🔘 Botones */
+.btn-ghost {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--muted);
+}
+
+.btn-primary {
+    background: var(--accent);
+    border: none;
+    color: white;
+}
+
+    .btn-primary:hover {
+        background: #0f60d0;
+    }
+
+/* ============================================================
+   🔹 HERO PRINCIPAL
+   ============================================================ */
+.hero {
+    position: relative;
+    overflow: hidden;
+    height: 420px;
+    border-radius: 16px;
+}
+
+.hero-bg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.35);
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.3), rgba(0,0,0,0.8));
+}
+
+.hero-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 700px;
+}
+
+/* ============================================================
+   🔹 GRID DE NOVELAS / CARDS
+   ============================================================ */
+.section-title {
+    color: var(--heading);
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1.25rem;
+}
+
+/* Card de novela */
+.card-novel {
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+
+    .card-novel:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+
+    .card-novel .thumb {
+        width: 100%;
+        height: 240px;
+        object-fit: cover;
+        display: block;
+    }
+
+    .card-novel .meta {
+        padding: .6rem .6rem .9rem;
+        text-align: center;
+    }
+
+        .card-novel .meta h5 {
+            margin: 0;
+            color: var(--heading);
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .card-novel .meta p {
+            margin: .35rem 0 0;
+            color: var(--muted);
+            font-size: .85rem;
+        }
+
+/* ============================================================
+   🔹 FORMULARIOS (Auth / Crear Novela / Capítulos)
+   ============================================================ */
+
+/* ---- Login / Registro ---- */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    background: var(--bg);
+}
+
+.auth-card {
+    background-color: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 2rem 2.5rem;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.5);
+}
+
+    .auth-card h2 {
+        color: var(--heading);
+        text-align: center;
+        margin-bottom: 1.5rem;
+        font-weight: 700;
+    }
+
+    .auth-card label {
+        color: var(--heading);
+        font-weight: 500;
+    }
+
+    .auth-card .form-control {
+        background-color: #2a2a2a;
+        border: 1px solid var(--border);
+        color: var(--heading);
+        border-radius: 6px;
+        padding: 0.6rem 1rem;
+    }
+
+        .auth-card .form-control:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 0.15rem rgba(18, 122, 254, 0.25);
+        }
+
+    .auth-card .btn-primary {
+        background-color: var(--accent);
+        border: none;
+        padding: 0.6rem;
+        border-radius: 6px;
+        font-weight: 600;
+    }
+
+        .auth-card .btn-primary:hover {
+            background-color: #0e63db;
+        }
+
+    .auth-card a {
+        color: var(--accent);
+        text-decoration: none;
+    }
+
+/* ---- Crear Novela ---- */
+.novela-create-container {
+    max-width: 850px;
+    margin: 0 auto;
+    padding-top: 2rem;
+}
+
+.form-control-dark, .form-select.form-control-dark {
+    background-color: #1f1f1f;
+    border: 1px solid #343434;
+    color: #eaeaea;
+    border-radius: 8px;
+    padding: 0.6rem 0.8rem;
+}
+
+    .form-control-dark:focus {
+        border-color: #127afe;
+        box-shadow: 0 0 0 0.15rem rgba(18, 122, 254, 0.25);
+        outline: none;
+    }
+
+.card.bg-dark.text-light {
+    background-color: #141414 !important;
+    border: 1px solid #2c2c2c !important;
+}
+
+/* ---- Crear Capítulo ---- */
+.capitulo-form-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+    .capitulo-form-container .card {
+        background-color: #1e1e1e;
+        border: 1px solid #333;
+        border-radius: 10px;
+    }
+
+    .capitulo-form-container .form-control {
+        background-color: #2b2b2b;
+        border: 1px solid #444;
+        color: #eee;
+        border-radius: 6px;
+    }
+
+        .capitulo-form-container .form-control:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25);
+        }
+
+/* ============================================================
+   🔹 MENÚ DE USUARIO
+   ============================================================ */
+.user-menu {
+    position: relative;
+}
+
+    .user-menu .dropdown-toggle {
+        color: #f8f9fa;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+        .user-menu .dropdown-toggle:hover {
+            color: var(--accent);
+        }
+
+    .user-menu .fa-user {
+        color: var(--accent);
+    }
+
+.dropdown-menu-dark {
+    background-color: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+}
+
+    .dropdown-menu-dark .dropdown-item {
+        color: #eee;
+        font-weight: 500;
+    }
+
+        .dropdown-menu-dark .dropdown-item:hover {
+            background-color: #3b3b3b;
+            color: var(--accent);
+        }
+
+    .dropdown-menu-dark .dropdown-divider {
+        border-top: 1px solid #555;
+    }
+
+/* ============================================================
+   🔹 FOOTER
+   ============================================================ */
+.site-footer {
+    border-top: 1px solid var(--border);
+    background: var(--bg-elev);
+    color: var(--muted);
+}
+
+/* ============================================================
+   🔹 RESPONSIVE
+   ============================================================ */
+@media (max-width: 991.98px) {
+    .hero .hero-bg {
+        height: 300px;
+    }
+
+    .hero .hero-content {
+        left: 24px;
+        bottom: 20px;
+        max-width: 60%;
+    }
+
+    .search-wrapper {
+        min-width: 120px;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .hero .hero-bg {
+        height: 220px;
+    }
+
+    .hero .hero-content {
+        left: 18px;
+        bottom: 12px;
+        max-width: 72%;
+    }
+
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: .75rem;
+    }
+
+    .brand-text {
+        display: none;
+    }
+}
+.pagination .page-link {
+    background-color: #1f1f1f;
+    color: #ccc;
+    border: 1px solid #333;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #127afe;
+    border-color: #127afe;
+    color: white;
+}
+.dropdown-menu-dark {
+    background-color: #1f1f1f;
+    border: 1px solid #333;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+}
+
+.dropdown-item.text-warning:hover {
+    color: #ffcc00 !important;
+}
+
+.dropdown-item.text-danger:hover {
+    color: #ff5c5c !important;
+}

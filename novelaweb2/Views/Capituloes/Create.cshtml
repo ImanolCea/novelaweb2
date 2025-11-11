@@ -1,0 +1,38 @@
+﻿@model novelaweb2.Models.Capitulo
+@{
+    ViewData["Title"] = "Agregar capítulo";
+}
+
+<div class="capitulo-form-container">
+    <div class="card p-4" style="background:#191919;border:1px solid #2d2d2d;border-radius:10px">
+        <h3 class="text-light mb-3"><i class="fa-solid fa-feather me-2"></i> Nuevo capítulo — @ViewBag.NovelaTitulo</h3>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger">@ViewBag.Error</div>
+        }
+
+        <form asp-action="Create" method="post">
+            <input type="hidden" name="novelaId" value="@ViewBag.NovelaId" />
+            <div class="mb-3">
+                <label class="form-label text-light">Número</label>
+                <input class="form-control" value="@ViewBag.ProximoNumero" readonly />
+            </div>
+            <div class="mb-3">
+                <label class="form-label text-light">Título</label>
+                <input name="titulo" class="form-control" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label text-light">Contenido</label>
+                <textarea name="contenido" rows="12" class="form-control" required></textarea>
+            </div>
+            <button class="btn btn-primary w-100" type="submit"><i class="fa-solid fa-floppy-disk me-2"></i> Publicar capítulo</button>
+        </form>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

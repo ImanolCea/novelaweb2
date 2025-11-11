@@ -1,0 +1,37 @@
+﻿@model IEnumerable<novelaweb2.Models.Novela>
+@{
+    ViewData["Title"] = "Mis Libros";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="text-light">Mis Libros</h2>
+    <a asp-action="Create" class="btn btn-primary"><i class="fa-solid fa-plus me-2"></i> Crear nueva novela</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert bg-dark text-light border-secondary">No tienes novelas todavía.</div>
+}
+else
+{
+    <div class="row g-4">
+        @foreach (var novela in Model)
+        {
+            <div class="col-md-4">
+                <div class="card novela-card h-100">
+                    <img src="@(novela.PortadaUrl ?? "/img/default-cover.jpg")" class="card-img-top" alt="@novela.Titulo" style="height:280px;object-fit:cover">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title text-light">@novela.Titulo</h5>
+                        <p class="text-muted mb-2">@novela.Genero</p>
+                        <p class="text-muted small flex-grow-1">
+                            @(
+                                                string.IsNullOrEmpty(novela.Sinopsis) ? "—" : (novela.Sinopsis.Length > 140 ? novela.Sinopsis.Substring(0, 140) + "..." : novela.Sinopsis)
+                                                )
+                    </p>
+                    <a asp-action="Details" asp-route-id="@novela.Id" class="btn btn-outline-primary mt-2">Ver detalles</a>
+                </div>
+            </div>
+        </div>
+        }
+    </div>
+}

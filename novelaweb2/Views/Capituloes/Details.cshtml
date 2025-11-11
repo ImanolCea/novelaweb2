@@ -1,0 +1,94 @@
+﻿@model novelaweb2.Models.Capitulo
+
+@{
+    ViewData["Title"] = Model.Titulo;
+}
+
+<section class="container mt-4">
+    <div class="card bg-dark text-light p-4 shadow">
+        <h2 class="fw-bold">@Model.Titulo</h2>
+        <p class="text-secondary mb-1">
+            Capítulo @Model.NumeroCapitulo — @Model.Novela?.Titulo
+        </p>
+        <hr />
+        <div class="mt-3" style="white-space: pre-line;">
+            @Model.Contenido
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between mt-4">
+        @if (ViewBag.AnteriorId != null)
+        {
+            <a class="btn btn-outline-primary" href="@Url.Action("Details", "Capitulos", new { id = ViewBag.AnteriorId })">← Anterior</a>
+        }
+        else
+        {
+
+            <div></div>
+        }
+
+        @if (ViewBag.SiguienteId != null)
+        {
+            <a class="btn btn-outline-primary" href="@Url.Action("Details", "Capitulos", new { id = ViewBag.SiguienteId })">Siguiente →</a>
+        }
+    </div>
+
+    <section class="comentarios mt-5">
+        <h3 class="mb-3 text-light">Comentarios</h3>
+
+        @if (Model.Comentarios != null && Model.Comentarios.Any())
+        {
+            <div class="comentarios-list">
+                @foreach (var c in Model.Comentarios.OrderByDescending(c => c.Fecha))
+                {
+                    <div class="comentario bg-dark p-3 rounded mb-3">
+                        <strong>@c.Usuario.NombreUsuario</strong>
+                        <small class="ms-2">@c.Fecha.ToString("g")</small>
+                        <p class="mt-2">@c.Contenido</p>
+
+                        @if (Context.Session.GetInt32("UsuarioId") == c.UsuarioId)
+                        {
+                            <form asp-action="Delete" asp-controller="Comentarios" method="post" class="d-inline">
+                                <input type="hidden" name="id" value="@c.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
+                            </form>
+                        }
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p>No hay comentarios aún. Sé el primero en opinar.</p>
+        }
+
+        @if (Context.Session.GetInt32("UsuarioId") != null)
+        {
+            <form asp-action="Create" asp-controller="Comentarios" method="post" class="mt-4">
+                <input type="hidden" name="capituloId" value="@Model.Id" />
+                <div class="mb-3">
+                    <textarea name="contenido" class="form-control form-control-dark" rows="3" placeholder="Escribe tu comentario..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Comentar</button>
+            </form>
+        }
+        else
+        {
+            <p class="mt-3">Inicia sesión para comentar.</p>
+        }
+    </section>
+
+
+@section Scripts {
+    <script>
+        function showEditForm(id, contenido) {
+            document.getElementById(`comment-text-${id}`).classList.add("d-none");
+            document.getElementById(`edit-form-${id}`).classList.remove("d-none");
+        }
+
+        function cancelEdit(id) {
+            document.getElementById(`comment-text-${id}`).classList.remove("d-none");
+            document.getElementById(`edit-form-${id}`).classList.add("d-none");
+        }
+    </script>
+}

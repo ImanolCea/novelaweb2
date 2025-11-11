@@ -1,0 +1,38 @@
+﻿@{
+    ViewData["Title"] = "Registro";
+}
+
+<div class="auth-container">
+    <div class="auth-card">
+        <h2>Crear cuenta</h2>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger">@ViewBag.Error</div>
+        }
+
+        <form asp-action="Register" method="post">
+            <div class="form-group mb-3">
+                <label>Nombre de usuario</label>
+                <input type="text" name="nombreUsuario" class="form-control" required />
+            </div>
+
+            <div class="form-group mb-3">
+                <label>Correo electrónico</label>
+                <input type="email" name="correo" class="form-control" required />
+            </div>
+
+            <div class="form-group mb-4">
+                <label>Contraseña</label>
+                <input type="password" name="contrasena" class="form-control" required />
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Registrar</button>
+
+            <p class="text-center mt-3">
+                ¿Ya tienes cuenta?
+                <a href="/Auth/Login">Inicia sesión</a>
+            </p>
+        </form>
+    </div>
+</div>

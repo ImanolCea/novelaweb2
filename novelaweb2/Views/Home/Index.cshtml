@@ -1,0 +1,72 @@
+﻿@model IEnumerable<novelaweb2.Models.Novela>
+
+@{
+    ViewData["Title"] = "Inicio";
+    var currentPage = ViewBag.CurrentPage as int? ?? 1;
+    var totalPages = ViewBag.TotalPages as int? ?? 1;
+}
+
+<section class="hero mb-5">
+    <img class="hero-bg" src="~/images/banner1.jpg" alt="Banner" />
+    <div class="hero-overlay"></div>
+    <div class="hero-content text-center text-light">
+        <h1>Explora Historias Épicas</h1>
+        <p>Lee y escribe novelas de fantasía, magia y mundos legendarios creados por nuestra comunidad.</p>
+        <a class="btn btn-primary mt-2" href="/Novelas/Create">Escribir tu novela</a>
+    </div>
+</section>
+
+<div class="container max-1200">
+    <div class="d-flex justify-content-between align-items-end mb-3">
+        <h3 class="section-title">Últimas Novelas Publicadas</h3>
+        <a class="text-muted small" href="/Novelas">Ver todas</a>
+    </div>
+
+    <div class="grid">
+        @if (Model != null && Model.Any())
+        {
+            foreach (var novela in Model)
+            {
+                <div class="card-novel">
+                    <a href="@Url.Action("Details", "Novelas", new { id = novela.Id })">
+                        <img class="thumb" src="@(string.IsNullOrEmpty(novela.PortadaUrl) ? Url.Content("~/images/no-cover.png") : novela.PortadaUrl)" alt="@novela.Titulo" />
+                        <div class="meta">
+                            <h5>@novela.Titulo</h5>
+                            <p>@novela.Genero · @novela.Capitulos.Count Capítulos</p>
+                        </div>
+                    </a>
+                </div>
+            }
+        }
+        else
+        {
+            <p>No hay novelas publicadas aún.</p>
+        }
+    </div>
+
+    <!-- ===== Paginación ===== -->
+    @if (totalPages > 1)
+    {
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                    <a class="page-link bg-dark text-light border-secondary"
+                       href="@Url.Action("Index", new { page = currentPage - 1 })">Anterior</a>
+                </li>
+
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(i == currentPage ? "active" : "")">
+                        <a class="page-link bg-dark text-light border-secondary @(i == currentPage ? "border-primary" : "")"
+                           href="@Url.Action("Index", new { page = i })">@i</a>
+                    </li>
+                }
+
+                <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                    <a class="page-link bg-dark text-light border-secondary"
+                       href="@Url.Action("Index", new { page = currentPage + 1 })">Siguiente</a>
+                </li>
+            </ul>
+        </nav>
+    }
+</div>

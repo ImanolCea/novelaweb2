@@ -1,0 +1,53 @@
+﻿@model IEnumerable<novelaweb2.Models.Seguimiento>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.FechaUltimaLectura)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Novela)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UltimoCapituloLeido)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Usuario)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.FechaUltimaLectura)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Novela.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UltimoCapituloLeido.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Usuario.Id)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

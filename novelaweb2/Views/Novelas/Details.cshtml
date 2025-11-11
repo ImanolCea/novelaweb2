@@ -1,0 +1,197 @@
+﻿@model novelaweb2.Models.Novela
+@using Microsoft.AspNetCore.Http
+
+@{
+    ViewData["Title"] = Model.Titulo;
+    var usuarioId = Context.Session.GetInt32("UsuarioId");
+    bool esAutor = usuarioId == Model.AutorId;
+    var seguimiento = Model.Seguimientos?.FirstOrDefault(s => s.UsuarioId == usuarioId);
+}
+
+<div class="container py-4 text-light">
+
+    <!-- CABECERA -->
+    <div class="row mb-4">
+        <div class="col-md-4 text-center">
+            <img src="@Model.PortadaUrl" class="img-fluid rounded shadow" style="max-height:400px;object-fit:cover;" />
+        </div>
+        <div class="col-md-8">
+            <h1 class="fw-bold mb-2">@Model.Titulo</h1>
+            <p><strong>Autor:</strong> @(Model.Autor?.NombreUsuario ?? "Desconocido")</p>
+            <p><strong>Género:</strong> @Model.Genero</p>
+            <p><strong>Estado:</strong> @Model.Estado</p>
+            <p style="color:#b6b6b6;">@Model.Sinopsis</p>
+
+            <!-- Etiquetas -->
+            @if (Model.Etiquetas != null && Model.Etiquetas.Any())
+            {
+                <div class="mb-3">
+                    @foreach (var e in Model.Etiquetas)
+                    {
+                        <span class="badge bg-primary me-1">@e.Nombre</span>
+                    }
+                </div>
+            }
+
+            <!-- Botones de seguimiento -->
+            @if (usuarioId != null && !esAutor)
+            {
+                <div class="d-flex gap-2 flex-wrap">
+                    <form method="post" asp-controller="Seguimientoes" asp-action="@(seguimiento == null ? "Seguir" : "DejarSeguir")">
+                        <input type="hidden" name="novelaId" value="@Model.Id" />
+                        <button type="submit" class="btn btn-outline-light btn-sm me-2">
+                            @(seguimiento == null ? "Seguir novela" : "Dejar de seguir")
+                        </button>
+                    </form>
+
+                    @if (Model.Capitulos != null && Model.Capitulos.Any())
+                    {
+                        var primer = Model.Capitulos.OrderBy(c => c.NumeroCapitulo).FirstOrDefault();
+                        var capActual = seguimiento?.UltimoCapituloLeidoId != null
+                        ? Model.Capitulos.FirstOrDefault(c => c.Id == seguimiento.UltimoCapituloLeidoId)
+                        : primer;
+
+                        if (capActual != null)
+                        {
+                            <a asp-controller="Capituloes" asp-action="Details" asp-route-id="@capActual.Id"
+                               class="btn btn-primary btn-sm">
+                                @(seguimiento?.UltimoCapituloLeidoId != null
+                                                    ? $"Continuar capítulo {capActual.NumeroCapitulo}"
+                                                    : "Iniciar desde el primer capítulo")
+                </a>
+                                }
+                    }
+                </div>
+            }
+
+            @if (esAutor)
+            {
+                <div class="mt-3">
+                    <a asp-controller="Capituloes" asp-action="Create" asp-route-novelaId="@Model.Id" class="btn btn-primary btn-sm mt-2">
+                        + Agregar Capítulo
+                    </a>
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-light btn-sm mt-2">
+                        Editar Novela
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- ===== TABS ===== -->
+    <ul class="nav nav-tabs mb-3" id="novelaTabs" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link active" id="capitulos-tab" data-bs-toggle="tab" data-bs-target="#capitulos" type="button" role="tab">Capítulos</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="resenas-tab" data-bs-toggle="tab" data-bs-target="#resenas" type="button" role="tab">Reseñas</button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="novelaTabsContent">
+        <!-- ===== TAB: CAPÍTULOS ===== -->
+        <div class="tab-pane fade show active" id="capitulos" role="tabpanel">
+            @if (Model.Capitulos != null && Model.Capitulos.Any())
+            {
+                <div class="list-group">
+                    @foreach (var cap in Model.Capitulos.OrderBy(c => c.NumeroCapitulo))
+                    {
+                        <a asp-controller="Capituloes" asp-action="Details" asp-route-id="@cap.Id"
+                           class="list-group-item list-group-item-action bg-dark text-light border-secondary d-flex justify-content-between align-items-center">
+                            <span><strong>Capítulo @cap.NumeroCapitulo:</strong> @cap.Titulo</span>
+                            <small style="color:#888;">@cap.FechaPublicacion.ToString("dd MMM yyyy")</small>
+                        </a>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-3" style="color:#b6b6b6;">
+                    Aún no hay capítulos disponibles.
+                </div>
+            }
+        </div>
+
+        <!-- ===== TAB: RESEÑAS ===== -->
+        <div class="tab-pane fade" id="resenas" role="tabpanel">
+            <div class="resenas-section mt-3">
+                @if (Model.Reseñas != null && Model.Reseñas.Any())
+                {
+                    @foreach (var r in Model.Reseñas.OrderByDescending(r => r.Fecha))
+                    {
+                        <div class="card bg-dark border-secondary mb-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="fw-bold">@r.Usuario?.NombreUsuario</h6>
+                                    <div>
+                                        @for (int i = 0; i < r.Puntuacion; i++)
+                                        {
+                                            <i class="fa-solid fa-star" style="color:gold;"></i>
+                                        }
+                                        @for (int i = r.Puntuacion; i < 5; i++)
+                                        {
+                                            <i class="fa-regular fa-star" style="color:#555;"></i>
+                                        }
+                                    </div>
+                                </div>
+                                <p class="mt-2">@r.Comentario</p>
+                                <small style="color:#888;">@r.Fecha.ToString("dd MMM yyyy")</small>
+
+                                @if (usuarioId == r.UsuarioId)
+                                {
+                                    <form asp-controller="Reseña" asp-action="Delete" method="post" class="mt-2">
+                                        <input type="hidden" name="id" value="@r.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="fa-solid fa-trash"></i> Eliminar
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="text-center py-3" style="color:#b6b6b6;">
+                        No hay reseñas aún. ¡Sé el primero en dejar una!
+                    </div>
+                }
+
+                <!-- ===== FORMULARIO DE NUEVA RESEÑA ===== -->
+                @if (usuarioId != null && !esAutor)
+                {
+                    <div class="card bg-dark border-secondary mt-4">
+                        <div class="card-body">
+                            <h5 class="text-light opacity-75 mb-3">Escribe una reseña</h5>
+                            <form asp-controller="Reseña" asp-action="Create" method="post">
+                                <input type="hidden" name="novelaId" value="@Model.Id" />
+                                <input type="hidden" name="usuarioId" value="@usuarioId" />
+                                <div class="mb-3">
+                                    <label class="text-light opacity-75">Puntuación</label>
+                                    <select class="form-select form-control-dark" name="puntuacion" required>
+                                        <option value="5">★★★★★</option>
+                                        <option value="4">★★★★☆</option>
+                                        <option value="3">★★★☆☆</option>
+                                        <option value="2">★★☆☆☆</option>
+                                        <option value="1">★☆☆☆☆</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="text-light opacity-75">Comentario</label>
+                                    <textarea name="comentario" class="form-control form-control-dark" rows="3" placeholder="¿Qué te pareció la novela?" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Publicar reseña</button>
+                            </form>
+                        </div>
+                    </div>
+                }
+                else if (usuarioId == null)
+                {
+                    <div class="mt-4 text-center">
+                        <p>Inicia sesión para dejar una reseña.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
