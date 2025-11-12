@@ -818,3 +818,66 @@ body.theme-light .chapters-list .chapter-item-custom:hover {
         background: #005fcc;
         border-color: #005fcc;
     }
+/* ===================================
+   ===== PÁGINAS DE AUTENTICACIÓN =====
+   =================================== */
+
+/* Contenedor principal para centrar el formulario en la pantalla */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Ajusta la altura si quieres centrar verticalmente, 
+       o usa un padding para dejarlo arriba */
+    min-height: calc(100vh - 80px); /* Ejemplo: 100% de la altura de la vista menos el navbar/footer */
+    padding: 2rem 1rem;
+}
+
+/* Tarjeta del formulario (Auth Card) */
+.auth-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem;
+    width: 100%;
+    max-width: 420px; /* Ancho fijo para formularios de auth */
+    box-shadow: var(--shadow);
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+    .auth-card h2 {
+        color: var(--heading);
+        text-align: center;
+        margin-bottom: 1.5rem;
+        font-weight: 700;
+    }
+
+    /* Estilo para los mensajes de error/éxito (usando las variables del tema) */
+    .auth-card .alert {
+        border-radius: var(--radius);
+        padding: 0.75rem 1rem;
+        margin-bottom: 1rem;
+        font-size: 0.95rem;
+    }
+
+    .auth-card .alert-danger {
+        background-color: #721c24; /* Rojo oscuro */
+        color: #f5c6cb;
+        border-color: #721c24;
+    }
+/* Estilo del error en Light Mode */
+body.theme-light .auth-card .alert-danger {
+    background-color: #f8d7da; /* Rojo claro */
+    color: #721c24;
+    border-color: #f5c6cb;
+}
+
+
+/* Etiquetas de formulario (para que se vean bien en ambos temas) */
+.auth-card .form-label,
+.auth-card label {
+    color: var(--text);
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    display: block; /* Asegura que la etiqueta tome su propia línea */
+}

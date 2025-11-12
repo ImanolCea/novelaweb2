@@ -97,7 +97,7 @@ namespace novelaweb2.Controllers
             HttpContext.Session.SetString("Rol", usuario.Rol?.Nombre ?? "Usuario");
 
             // Redirigir al área de bookmarks
-            return RedirectToAction("MisBookmarks", "Seguimientoes");
+            return RedirectToAction("Index", "Home");
         }
 
         // =====================================================
