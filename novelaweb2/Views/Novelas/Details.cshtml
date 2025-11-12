@@ -77,10 +77,15 @@
                                         <div class="chapter-actions d-flex gap-2">
                                             <a asp-controller="Capituloes" asp-action="Edit" asp-route-id="@cap.Id"
                                                class="btn btn-sm btn-warning"><i class="fa fa-edit"></i></a>
-                                            <form asp-controller="Capituloes" asp-action="Delete" method="post" class="d-inline">
+                                            <form asp-controller="Capituloes" asp-action="Delete" method="post" class="d-inline delete-capitulo-form">
+                                                @Html.AntiForgeryToken()
                                                 <input type="hidden" name="id" value="@cap.Id" />
-                                                <button type="submit" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
+                                                <button type="button" class="btn btn-sm btn-danger btn-delete-capitulo">
+                                                    <i class="fa fa-trash"></i>
+                                                </button>
                                             </form>
+
+
                                         </div>
                                     }
                                 </div>
@@ -113,3 +118,44 @@
         </div>
     </div>
 </div>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const deleteButtons = document.querySelectorAll(".btn-delete-capitulo");
+
+            deleteButtons.forEach(button => {
+                button.addEventListener("click", function () {
+                    const form = button.closest(".delete-capitulo-form");
+
+                    Swal.fire({
+                        title: '¿Eliminar este capítulo?',
+                        text: "Esta acción no se puede deshacer.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Sí, eliminar',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
+
+            // Mostrar mensaje de éxito si existe en TempData
+            const successMsg = '@TempData["Success"]';
+            if (successMsg) {
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Éxito!',
+                    text: successMsg,
+                    timer: 2500,
+                    showConfirmButton: false
+                });
+            }
+        });
+    </script>
+}

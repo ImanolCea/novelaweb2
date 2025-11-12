@@ -150,8 +150,13 @@ namespace novelaweb2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
-            var capitulo = await _context.Capitulos.Include(c => c.Novela).FirstOrDefaultAsync(c => c.Id == id);
-            if (capitulo == null) return NotFound();
+            var capitulo = await _context.Capitulos
+                .Include(c => c.Novela)
+                .ThenInclude(n => n.Autor)
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (capitulo == null)
+                return NotFound();
 
             var usuarioNombre = HttpContext.Session.GetString("UsuarioNombre");
             if (usuarioNombre != capitulo.Novela?.Autor?.NombreUsuario)
@@ -163,6 +168,8 @@ namespace novelaweb2.Controllers
             TempData["Success"] = "Capítulo eliminado correctamente.";
             return RedirectToAction("Details", "Novelas", new { id = capitulo.NovelaId });
         }
+
+
 
     }
 }
