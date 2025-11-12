@@ -109,10 +109,16 @@ namespace novelaweb2.Controllers
         // GET: Capituloes/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null) return NotFound();
+            if (id == null)
+                return NotFound();
 
-            var capitulo = await _context.Capitulos.Include(c => c.Novela).FirstOrDefaultAsync(c => c.Id == id);
-            if (capitulo == null) return NotFound();
+            var capitulo = await _context.Capitulos
+                .Include(c => c.Novela)
+                .ThenInclude(n => n.Autor)
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (capitulo == null)
+                return NotFound();
 
             var usuarioNombre = HttpContext.Session.GetString("UsuarioNombre");
             if (usuarioNombre != capitulo.Novela?.Autor?.NombreUsuario)
@@ -126,10 +132,16 @@ namespace novelaweb2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Capitulo capitulo)
         {
-            if (id != capitulo.Id) return NotFound();
+            if (id != capitulo.Id)
+                return NotFound();
 
-            var original = await _context.Capitulos.Include(c => c.Novela).FirstOrDefaultAsync(c => c.Id == id);
-            if (original == null) return NotFound();
+            var original = await _context.Capitulos
+                .Include(c => c.Novela)
+                .ThenInclude(n => n.Autor)
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (original == null)
+                return NotFound();
 
             var usuarioNombre = HttpContext.Session.GetString("UsuarioNombre");
             if (usuarioNombre != original.Novela?.Autor?.NombreUsuario)
@@ -142,32 +154,33 @@ namespace novelaweb2.Controllers
             await _context.SaveChangesAsync();
 
             TempData["Success"] = "Capítulo editado correctamente.";
-            return RedirectToAction("Details", new { id });
+            return RedirectToAction("Details", "Novelas", new { id = original.NovelaId });
         }
+
 
         // POST: Capituloes/Delete
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var capitulo = await _context.Capitulos
-                .Include(c => c.Novela)
-                .ThenInclude(n => n.Autor)
-                .FirstOrDefaultAsync(c => c.Id == id);
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> Delete(int id)
+{
+    var capitulo = await _context.Capitulos
+        .Include(c => c.Novela)
+        .ThenInclude(n => n.Autor)
+        .FirstOrDefaultAsync(c => c.Id == id);
 
-            if (capitulo == null)
-                return NotFound();
+    if (capitulo == null)
+        return NotFound();
 
-            var usuarioNombre = HttpContext.Session.GetString("UsuarioNombre");
-            if (usuarioNombre != capitulo.Novela?.Autor?.NombreUsuario)
-                return Unauthorized();
+    var usuarioNombre = HttpContext.Session.GetString("UsuarioNombre");
+    if (usuarioNombre != capitulo.Novela?.Autor?.NombreUsuario)
+        return Unauthorized();
 
-            _context.Capitulos.Remove(capitulo);
-            await _context.SaveChangesAsync();
+    _context.Capitulos.Remove(capitulo);
+    await _context.SaveChangesAsync();
 
-            TempData["Success"] = "Capítulo eliminado correctamente.";
-            return RedirectToAction("Details", "Novelas", new { id = capitulo.NovelaId });
-        }
+    TempData["Success"] = "Capítulo eliminado correctamente.";
+    return RedirectToAction("Details", "Novelas", new { id = capitulo.NovelaId });
+}
 
 
 
