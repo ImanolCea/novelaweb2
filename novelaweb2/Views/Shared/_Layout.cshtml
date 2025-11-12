@@ -12,7 +12,8 @@
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <script src="https://kit.fontawesome.com/6ab590c83b.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+          integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLMDJ8E2S08+3ETQd/ty/z1+T1g+n9dJ8R/uA6FhG/lE/O7/8s..." crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <script src="~/js/theme.js" asp-append-version="true"></script>
 </head>
@@ -47,8 +48,8 @@
                     </ul>
 
                     <div class="d-flex align-items-center gap-2">
-                        <button class="btn-theme-toggle" onclick="toggleTheme()" title="Cambiar modo claro/oscuro">
-                            <i class="fa-solid" id="theme-icon"></i>
+                        <button class="btn btn-theme-toggle" onclick="toggleTheme()" title="Cambiar modo claro/oscuro">
+                            <i class="fa-solid theme-icon-dynamic"></i>
                         </button>
 
                         @if (Context.Session.GetString("UsuarioNombre") != null)

@@ -1,30 +1,146 @@
 ﻿@model IEnumerable<novelaweb2.Models.Novela>
-@foreach (var novela in Model)
-{
-    <div class="card bg-dark text-light mb-3 p-3">
-        <h4>@novela.Titulo</h4>
-        <p class="text-muted mb-1">@novela.Genero</p>
-        <p class="mb-2">@novela.Sinopsis</p>
-
-        <div class="d-flex justify-content-center gap-2 mt-2">
-            <a asp-action="Details" asp-route-id="@novela.Id" class="btn btn-primary btn-sm">
-                <i class="fa fa-eye"></i> Ver
-            </a>
-
-            @if (Context.Session.GetInt32("UsuarioId") == novela.AutorId)
-            {
-                <a asp-action="Edit" asp-route-id="@novela.Id" class="btn btn-warning btn-sm">
-                    <i class="fa fa-edit"></i> Editar
-                </a>
-
-                <form asp-action="Delete" method="post" class="d-inline">
-                    <input type="hidden" name="id" value="@novela.Id" />
-                    <button type="submit" class="btn btn-danger btn-sm">
-                        <i class="fa fa-trash"></i> Eliminar
-                    </button>
-                </form>
-            }
-        </div>
-    </div>
+@{
+    ViewData["Title"] = "Mis Novelas";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-light fw-bold m-0">📚 Mis Novelas</h2>
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="fa fa-plus"></i> Añadir novela
+        </a>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info text-center">Aún no has creado ninguna novela.</div>
+        <div class="text-center mt-3">
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="fa fa-plus"></i> Crear tu primera novela
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            @foreach (var novela in Model)
+            {
+                <div class="col">
+                    <div class="card bg-dark text-light h-100 shadow-sm hover-scale">
+                        <div class="card-body d-flex flex-column">
+                            <h4 class="card-title text-primary">@novela.Titulo</h4>
+                            <p class="text-muted mb-1"><strong>Género:</strong> @novela.Genero</p>
+                            <p class="card-text flex-grow-1">@novela.Sinopsis</p>
+
+                            <div class="d-flex justify-content-center gap-2 mt-3">
+                                <a asp-action="Details" asp-route-id="@novela.Id" class="btn btn-primary btn-sm">
+                                    <i class="fa fa-eye"></i> Ver
+                                </a>
+
+                                @if (Context.Session.GetInt32("UsuarioId") == novela.AutorId)
+                                {
+                                    <a asp-action="Edit" asp-route-id="@novela.Id" class="btn btn-warning btn-sm">
+                                        <i class="fa fa-edit"></i> Editar
+                                    </a>
+
+                                    <form asp-action="Delete" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@novela.Id" />
+                                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Eliminar esta novela?')">
+                                            <i class="fa fa-trash"></i> Eliminar
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const success = '@TempData["Success"]';
+            const error = '@TempData["Error"]';
+
+            if (success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Éxito',
+                    text: success,
+                    background: document.body.classList.contains('theme-light') ? '#fff' : '#2b2b2b',
+                    color: document.body.classList.contains('theme-light') ? '#000' : '#fff'
+                });
+            }
+            if (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error,
+                    background: document.body.classList.contains('theme-light') ? '#fff' : '#2b2b2b',
+                    color: document.body.classList.contains('theme-light') ? '#000' : '#fff'
+                });
+            }
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Obtenemos los colores de las variables CSS para el modal
+            const isLight = document.body.classList.contains('theme-light');
+
+            // Obtener el valor computado de las variables CSS
+            const getCssVar = (name) => getComputedStyle(document.body).getPropertyValue(name).trim();
+
+            const modalBg = isLight ? getCssVar('--panel') : getCssVar('--panel'); // Usar --panel para el fondo del modal
+            const modalColor = isLight ? getCssVar('--text') : getCssVar('--text'); // Usar --text para el texto
+
+            const success = '@TempData["Success"]';
+            const error = '@TempData["Error"]';
+
+            if (success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Éxito',
+                    text: success,
+                    // Referenciar las variables CSS
+                    background: modalBg,
+                    color: modalColor
+                });
+            }
+            if (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error,
+                    // Referenciar las variables CSS
+                    background: modalBg,
+                    color: modalColor
+                });
+            }
+        });
+    </script>
+}
+
+<style>
+    .hover-scale {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .hover-scale:hover {
+            transform: scale(1.03);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+</style>

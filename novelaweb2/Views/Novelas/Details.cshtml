@@ -5,10 +5,11 @@
 
 <div class="container mt-4">
     <div class="row">
-        <!-- Portada -->
         <div class="col-md-3 text-center">
             <img src="@Model.PortadaUrl" class="img-fluid rounded shadow mb-3" alt="@Model.Titulo" />
-            <div class="details-buttons">
+
+            <div class="details-buttons d-grid gap-2">
+
                 <form asp-controller="Seguimientoes" asp-action="Seguir" method="post">
                     <input type="hidden" name="novelaId" value="@Model.Id" />
                     <button class="btn btn-primary w-100">Seguir</button>
@@ -31,18 +32,17 @@
 
                 @if (Context.Session.GetString("UsuarioNombre") == Model.Autor?.NombreUsuario)
                 {
-                    <a class="btn btn-accent w-100" asp-controller="Capituloes" asp-action="Create" asp-route-novelaId="@Model.Id">
+                    <a class="btn btn-warning w-100" asp-controller="Capituloes" asp-action="Create" asp-route-novelaId="@Model.Id">
                         <i class="fa fa-plus me-1"></i> Agregar capítulo
                     </a>
                 }
             </div>
         </div>
 
-        <!-- Detalles -->
         <div class="col-md-9">
-            <h2 class="text-light mb-3">@Model.Titulo</h2>
+            <h2 class="mb-3">@Model.Titulo</h2>
 
-            <ul class="nav nav-tabs mb-3" id="novelaTabs" role="tablist">
+            <ul class="nav nav-tabs nav-tabs-custom mb-3" id="novelaTabs" role="tablist">
                 <li class="nav-item">
                     <a class="nav-link active" id="capitulos-tab" data-bs-toggle="tab" href="#capitulos" role="tab">Capítulos</a>
                 </li>
@@ -62,29 +62,30 @@
                     }
                     else
                     {
-                        @foreach (var cap in Model.Capitulos.OrderBy(c => c.NumeroCapitulo))
-                        {
-                            <div class="chapter-item d-flex justify-content-between align-items-center border-bottom py-2">
-                                <div>
-                                    <a asp-controller="Capituloes" asp-action="Details" asp-route-id="@cap.Id">
-                                        Capítulo @cap.NumeroCapitulo — @cap.Titulo
-                                    </a>
-                                </div>
-
-                                @if (Context.Session.GetString("UsuarioNombre") == Model.Autor?.NombreUsuario)
-                                {
-                                    <div class="chapter-actions d-flex gap-2">
-                                        <a asp-controller="Capituloes" asp-action="Edit" asp-route-id="@cap.Id"
-                                           class="btn btn-sm btn-warning"><i class="fa fa-edit"></i></a>
-                                        <form asp-controller="Capituloes" asp-action="Delete" method="post" class="d-inline">
-                                            <input type="hidden" name="id" value="@cap.Id" />
-                                            <button type="submit" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
-                                        </form>
+                        <div class="chapters-list">
+                            @foreach (var cap in Model.Capitulos.OrderBy(c => c.NumeroCapitulo))
+                            {
+                                <div class="chapter-item-custom d-flex justify-content-between align-items-center py-2">
+                                    <div>
+                                        <a asp-controller="Capituloes" asp-action="Details" asp-route-id="@cap.Id">
+                                            Capítulo @cap.NumeroCapitulo — @cap.Titulo
+                                        </a>
                                     </div>
-                                }
-                            </div>
-                        }
 
+                                    @if (Context.Session.GetString("UsuarioNombre") == Model.Autor?.NombreUsuario)
+                                    {
+                                        <div class="chapter-actions d-flex gap-2">
+                                            <a asp-controller="Capituloes" asp-action="Edit" asp-route-id="@cap.Id"
+                                               class="btn btn-sm btn-warning"><i class="fa fa-edit"></i></a>
+                                            <form asp-controller="Capituloes" asp-action="Delete" method="post" class="d-inline">
+                                                <input type="hidden" name="id" value="@cap.Id" />
+                                                <button type="submit" class="btn btn-sm btn-danger"><i class="fa fa-trash"></i></button>
+                                            </form>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
                     }
                 </div>
 
@@ -99,10 +100,10 @@
                     }
                     else
                     {
-                        foreach (var r in Model.Reseñas)
+                        @foreach (var r in Model.Reseñas)
                         {
-                            <div class="border-bottom pb-2 mb-2">
-                                <strong>@r.Usuario?.NombreUsuario:</strong>
+                            <div class="review-item border-bottom pb-2 mb-2">
+                                <strong class="text-accent">@r.Usuario?.NombreUsuario:</strong>
                                 <p>@r.Comentario</p>
                             </div>
                         }

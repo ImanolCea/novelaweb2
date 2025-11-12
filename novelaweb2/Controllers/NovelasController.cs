@@ -4,6 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using novelaweb2.Models;
 using novelaweb2.Models.ViewModels;
 
+
+
 namespace novelaweb2.Controllers
 {
     public class NovelasController : Controller

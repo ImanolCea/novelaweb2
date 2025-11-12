@@ -1,28 +1,94 @@
+@model IEnumerable<novelaweb2.Models.Novela>
 @{
+    ViewData["Title"] = "Administrar Novelas";
     Layout = "~/Views/Shared/_Layout.cshtml";
-
 }
+
 <link rel="stylesheet" href="https://cdn.datatables.net/2.0.2/css/dataTables.dataTables.min.css">
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
 <script src="https://cdn.datatables.net/2.0.2/js/dataTables.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <div class="container mt-4">
-    <h2 class="text-center text-light mb-4">Panel de Administración</h2>
-    <div class="table-responsive">
-        <table class="table table-dark table-hover align-middle rounded">
-            <thead><tr><th>ID</th><th>Ejemplo</th></tr></thead>
-            <tbody><tr><td>1</td><td>Vista de ejemplo</td></tr></tbody>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="text-light fw-bold">📚 Administrar Novelas</h2>
+        <a asp-action="CrearNovela" class="btn btn-primary">
+            <i class="fa fa-plus"></i> Agregar novela
+        </a>
+    </div>
+
+    <div class="card bg-dark p-3 rounded shadow-sm">
+        <table id="novelasTable" class="table table-dark table-hover align-middle w-100">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Título</th>
+                    <th>Autor</th>
+                    <th>Género</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var novela in Model)
+                {
+                    <tr>
+                        <td>@novela.Id</td>
+                        <td>@novela.Titulo</td>
+                        <td>@novela.Autor?.NombreUsuario</td>
+                        <td>@novela.Genero</td>
+                        <td>
+                            <a asp-action="DetalleNovela" asp-route-id="@novela.Id" class="btn btn-outline-light btn-sm">
+                                <i class="fa fa-eye"></i>
+                            </a>
+                            <a asp-action="EditarNovela" asp-route-id="@novela.Id" class="btn btn-warning btn-sm">
+                                <i class="fa fa-edit"></i> Editar
+                            </a>
+                            <form asp-action="EliminarNovela" method="post" class="d-inline">
+                                <input type="hidden" name="id" value="@novela.Id" />
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    <i class="fa fa-trash"></i> Eliminar
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
         </table>
     </div>
 </div>
+
 @section Scripts {
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    new DataTable("table", {language: {url: "https://cdn.datatables.net/plug-ins/2.0.2/i18n/es-ES.json"}});
-    const success = '@TempData["Success"]';
-    const error = '@TempData["Error"]';
-    if (success) Swal.fire({icon: 'success', title: 'Éxito', text: success});
-    if (error) Swal.fire({icon: 'error', title: 'Error', text: error});
-});
-</script>
+    <script>
+        $(document).ready(function () {
+            new DataTable('#novelasTable', {
+                language: { url: 'https://cdn.datatables.net/plug-ins/2.0.2/i18n/es-ES.json' },
+                pageLength: 10,
+                responsive: true
+            });
+
+            const success = '@TempData["Success"]';
+            const error = '@TempData["Error"]';
+            if (success)
+                Swal.fire({ icon: 'success', title: 'Éxito', text: success });
+            if (error)
+                Swal.fire({ icon: 'error', title: 'Error', text: error });
+
+            $('form').on('submit', function (e) {
+                e.preventDefault();
+                const form = this;
+                Swal.fire({
+                    title: '¿Eliminar novela?',
+                    text: 'Esta acción no se puede deshacer.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) form.submit();
+                });
+            });
+        });
+    </script>
 }

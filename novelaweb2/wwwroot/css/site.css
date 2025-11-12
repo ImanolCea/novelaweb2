@@ -33,9 +33,10 @@ html {
 }
 
 body {
+    /* Estas 3 propiedades crean el "sticky footer" */
     display: flex;
     flex-direction: column;
-    min-height: 100vh; /* Ocupa al menos toda la altura de la pantalla */
+    min-height: 100vh;
     margin: 0;
     background: var(--bg);
     color: var(--text);
@@ -47,7 +48,6 @@ body {
 main {
     flex: 1 0 auto; /* Permite que crezca y ocupe el espacio disponible */
     width: 100%;
-    /* Recomendado: usa .container de Bootstrap dentro de <main> */
 }
 
 img {
@@ -65,13 +65,14 @@ a {
 
     a:hover {
         color: #66a8ff;
-        text-decoration: underline;
+        text-decoration: none; /* Opcional: quitar subrayado */
     }
 
     /* Estilo de foco visible para accesibilidad */
     a:focus-visible,
     .btn:focus-visible,
-    .form-control:focus-visible {
+    .form-control:focus-visible,
+    .form-select:focus-visible {
         outline: 2px solid var(--accent);
         outline-offset: 2px;
         box-shadow: none;
@@ -94,6 +95,19 @@ a {
     letter-spacing: 1px;
 }
 
+    /* Icono y texto del Brand en la Navbar */
+    .navbar-brand .brand-icon {
+        margin-right: 0.5rem;
+        font-size: 1.5rem;
+        color: var(--accent);
+    }
+
+    .navbar-brand .brand-text {
+        font-weight: 700;
+        font-size: 1.2rem;
+    }
+
+
 .nav-link {
     color: var(--text) !important;
     margin-right: 1rem;
@@ -103,6 +117,35 @@ a {
     .nav-link:hover,
     .nav-link.active {
         color: var(--accent) !important;
+    }
+
+/* Dropdown de usuario */
+.user-menu .dropdown-toggle {
+    color: var(--text) !important;
+    font-weight: 600;
+}
+
+    .user-menu .dropdown-toggle:hover {
+        color: var(--accent) !important;
+    }
+
+.user-menu .dropdown-menu {
+    background-color: var(--panel);
+    border-color: var(--border);
+}
+
+.user-menu .dropdown-item {
+    color: var(--text);
+}
+
+    .user-menu .dropdown-item:hover {
+        color: var(--heading);
+        background-color: var(--bg-elev);
+    }
+
+    .user-menu .dropdown-item.text-danger:hover {
+        color: #fff;
+        background-color: #c82333;
     }
 
 /* ===== Botones ===== */
@@ -140,7 +183,18 @@ a {
         color: var(--text);
     }
 
-/* ... (otros botones btn-warning, btn-danger) ... */
+/* Botón personalizado "Ghost" (para Registrarse) */
+.btn-ghost {
+    background: transparent;
+    color: var(--accent);
+    border-color: var(--accent);
+}
+
+    .btn-ghost:hover {
+        background: var(--accent);
+        color: #fff;
+    }
+
 
 /* ===== Botón de tema ===== */
 .btn-theme-toggle {
@@ -150,7 +204,7 @@ a {
     border: 1px solid var(--border);
     background: var(--panel);
     color: var(--text);
-    font-size: 1.2rem; /* Aumentar ícono */
+    font-size: 1.1rem; /* Ajuste de ícono */
     padding: 0;
     display: inline-flex;
     align-items: center;
@@ -181,20 +235,6 @@ a {
 .card-footer {
     border-top: 1px solid var(--border);
     border-bottom: 0;
-}
-
-/* En grillas de series / inicio */
-.card-novel .thumb {
-    height: 280px;
-    width: 100%;
-    object-fit: cover; /* Asegura que la imagen cubra el espacio */
-}
-
-/* En banners grandes */
-.hero-bg {
-    height: 380px !important;
-    width: 100%;
-    object-fit: cover;
 }
 
 /* ===== Tablas ===== */
@@ -267,14 +307,281 @@ a {
         margin-bottom: 0;
     }
 
+/* =====================
+   ===== PÁGINA HOME =====
+   ===================== */
+
+/* --- Contenedor Max-Width --- */
+.max-1200 {
+    max-width: var(--max-width);
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* --- Hero Banner (Destacadas) --- */
+.hero {
+    position: relative;
+    height: 380px;
+    border-radius: var(--radius);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+}
+
+.hero-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Oscurece la imagen */
+    z-index: 2;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 3;
+    padding: 2rem;
+}
+
+    .hero-content .btn {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(5px);
+        color: #fff;
+    }
+
+        .hero-content .btn:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+
+/* --- Grid de Novelas --- */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1.25rem;
+}
+
+/* --- Tarjeta de Novela (Custom) --- */
+.card-novel {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .card-novel:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+
+    .card-novel .thumb {
+        width: 100%;
+        height: 280px;
+        object-fit: cover;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .card-novel .meta {
+        padding: 0.75rem 1rem;
+        flex-grow: 1;
+    }
+
+        .card-novel .meta h5 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--heading);
+            margin-bottom: 0.25rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: color 0.2s ease;
+        }
+
+        .card-novel .meta p {
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-bottom: 0;
+        }
+
+    .card-novel:hover .meta h5 {
+        color: var(--accent);
+    }
+
+
+/* =====================
+   ===== PAGINACIÓN =====
+   ===================== */
+.page-link {
+    background-color: var(--panel);
+    border-color: var(--border);
+    color: var(--text);
+}
+
+    .page-link:hover {
+        background-color: var(--bg-elev);
+        border-color: var(--border);
+        color: var(--accent);
+    }
+
+.page-item.active .page-link {
+    background-color: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    z-index: 1;
+}
+
+.page-item.disabled .page-link {
+    background-color: var(--panel);
+    color: var(--muted);
+    border-color: var(--border);
+}
+
+
 /* ===== Footer ===== */
 footer {
-    margin-top: auto; /* Se asegura de estar al final */
+    /* mt-auto es clave para el "sticky footer" */
+    margin-top: auto;
     border-top: 1px solid var(--border);
     background: var(--bg-elev);
     color: var(--muted);
-    padding: 1.5rem 1rem; /* Más espaciado */
+    padding: 1.5rem 1rem;
     text-align: center;
+}
+/* ==========================
+   ===== PÁGINA DE LECTURA =====
+   ========================== */
+
+/* Contenedor principal del lector */
+.reader-container {
+    max-width: 840px; /* Ancho cómodo para lectura (ej: 800px + padding) */
+    margin: 0 auto; /* Centra el lector en la página */
+}
+
+/* Barra de controles superior */
+.reader-header {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius);
+    margin-bottom: 1.5rem; /* Espacio antes del título */
+}
+
+/* Botones de navegación (Ant/Sig) */
+.btn-reader-nav {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 42px; /* Ancho fijo */
+    height: 38px; /* Alto (como el btn-theme-toggle) */
+    border-radius: var(--radius);
+    font-size: 0.9rem;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .btn-reader-nav:hover {
+        background: var(--accent);
+        color: #fff;
+        border-color: var(--accent);
+    }
+
+    .btn-reader-nav:disabled {
+        background: var(--panel);
+        color: var(--muted);
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+/* Selector de fuente */
+.reader-fontsize {
+    width: auto; /* Se ajusta al contenido */
+    max-width: 90px; /* Límite */
+}
+
+/* Contenido del capítulo */
+.reader-content {
+    /* Hacemos el fondo transparente, como en la imagen */
+    background: transparent;
+    padding: 0; /* Quitamos el padding p-4 de la clase */
+    border: none;
+    box-shadow: none;
+}
+
+.chapter-title {
+    color: var(--heading);
+    font-weight: 700;
+    text-align: left;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+/* Texto del capítulo */
+.chapter-text {
+    color: var(--text);
+    font-size: 18px; /* El default de tu script */
+    line-height: 1.75; /* Espaciado vital para leer */
+    font-family: var(--font); /* Usa la fuente Inter */
+}
+    /* Estilo para los párrafos generados por @Html.Raw */
+    .chapter-text p {
+        margin-bottom: 1.25rem;
+    }
+
+/* ===================================
+   ===== PÁGINA LECTURA (LIGHT THEME) =====
+   =================================== */
+
+body.theme-light .reader-header {
+    background: #fff;
+    border-color: #ddd;
+}
+
+body.theme-light .btn-reader-nav {
+    background: #f0f0f0;
+    color: #222;
+    border-color: #ccc;
+}
+
+    body.theme-light .btn-reader-nav:hover {
+        background: var(--accent);
+        color: #fff;
+    }
+
+    body.theme-light .btn-reader-nav:disabled {
+        background: #f0f0f0;
+        color: var(--muted);
+    }
+
+body.theme-light .chapter-title {
+    color: var(--heading);
+    border-color: #ccc;
+}
+
+body.theme-light .chapter-text {
+    color: var(--text);
 }
 
 /* =====================
@@ -298,7 +605,8 @@ body.theme-light {
         border-color: #ddd;
     }
 
-    body.theme-light .card {
+    body.theme-light .card,
+    body.theme-light .card-novel {
         background: #fff;
         color: var(--text);
         border-color: #ddd;
@@ -320,11 +628,34 @@ body.theme-light {
             background: #d1d5da;
         }
 
+    body.theme-light .btn-ghost {
+        color: var(--accent);
+        border-color: var(--accent);
+    }
+
+        body.theme-light .btn-ghost:hover {
+            background: var(--accent);
+            color: #fff;
+        }
+
     body.theme-light .btn-theme-toggle {
         background: #fff;
         color: #000;
         border-color: #ccc;
     }
+
+    body.theme-light .user-menu .dropdown-menu {
+        background-color: #fff;
+        border-color: #ddd;
+    }
+
+    body.theme-light .user-menu .dropdown-item {
+        color: var(--text);
+    }
+
+        body.theme-light .user-menu .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
 
     body.theme-light .comments-container {
         background: #f1f3f5;
@@ -357,6 +688,29 @@ body.theme-light {
             background: #fff;
         }
 
+    /* Paginación en Light Mode */
+    body.theme-light .page-link {
+        background-color: #fff;
+        border-color: #ddd;
+        color: var(--accent);
+    }
+
+        body.theme-light .page-link:hover {
+            background-color: #e9ecef;
+            color: #0056b3;
+        }
+
+    body.theme-light .page-item.disabled .page-link {
+        background-color: #fff;
+        color: var(--muted);
+        border-color: #ddd;
+    }
+
+    body.theme-light .page-item.active .page-link {
+        color: #fff;
+    }
+
+
 /* ===== Responsivo ===== */
 @media (max-width: 768px) {
     .navbar-nav {
@@ -368,9 +722,99 @@ body.theme-light {
         width: 100%;
     }
 
-    /* Asumo que .chapter-item es una lista de capítulos */
-    .chapter-item {
-        flex-direction: column;
-        align-items: flex-start;
+    /* Ajustar grid en móviles */
+    .grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 0.75rem;
+    }
+
+    .card-novel .thumb {
+        height: 200px; /* Portadas más pequeñas en móvil */
+    }
+
+    .hero {
+        height: 300px;
+    }
+
+    .hero-content h1 {
+        font-size: 1.75rem;
     }
 }
+/* ===================================
+   ===== NOVELA DETAILS (Tabs) =====
+   =================================== */
+
+/* Estilos de las pestañas (Tabs) */
+.nav-tabs-custom {
+    border-bottom: 1px solid var(--border);
+}
+
+    .nav-tabs-custom .nav-link {
+        color: var(--muted);
+        background-color: transparent;
+        border: 1px solid transparent;
+        border-top-left-radius: var(--radius);
+        border-top-right-radius: var(--radius);
+        margin-bottom: -1px; /* Para que el borde activo cubra el inferior */
+        padding: 0.5rem 1rem;
+        font-weight: 600;
+        transition: color 0.2s, border-color 0.2s;
+    }
+
+        /* Estado Activo */
+        .nav-tabs-custom .nav-link.active {
+            color: var(--heading);
+            background-color: transparent; /* Fondo transparente */
+            border-color: var(--border) var(--border) transparent; /* Solo bordes laterales y superior */
+            border-bottom: 2px solid var(--accent); /* Línea de acento inferior */
+        }
+
+        /* Hover en modo oscuro */
+        .nav-tabs-custom .nav-link:hover:not(.active) {
+            border-color: var(--border) var(--border) var(--border);
+            color: var(--text);
+        }
+
+/* --- Lista de Capítulos --- */
+.chapter-item-custom {
+    border-bottom: 1px solid var(--border) !important;
+    transition: background-color 0.2s;
+}
+
+.chapters-list .chapter-item-custom:hover {
+    background-color: var(--bg-elev); /* Iluminar al pasar el ratón */
+    border-radius: var(--radius);
+}
+
+/* Asegurar que el enlace use el color del tema */
+.chapter-item-custom a {
+    color: var(--text);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+    .chapter-item-custom a:hover {
+        color: var(--accent);
+    }
+
+/* === Estilos específicos para el Tema Claro === */
+
+body.theme-light .nav-tabs-custom .nav-link.active {
+    border-color: #ddd #ddd transparent;
+}
+
+body.theme-light .chapters-list .chapter-item-custom:hover {
+    background-color: #f1f3f5;
+}
+
+/* Botones especiales del autor (si usas btn-accent) */
+.btn-accent {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+}
+
+    .btn-accent:hover {
+        background: #005fcc;
+        border-color: #005fcc;
+    }
