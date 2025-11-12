@@ -1,0 +1,30 @@
+﻿@model IEnumerable<novelaweb2.Models.Novela>
+@foreach (var novela in Model)
+{
+    <div class="card bg-dark text-light mb-3 p-3">
+        <h4>@novela.Titulo</h4>
+        <p class="text-muted mb-1">@novela.Genero</p>
+        <p class="mb-2">@novela.Sinopsis</p>
+
+        <div class="d-flex justify-content-center gap-2 mt-2">
+            <a asp-action="Details" asp-route-id="@novela.Id" class="btn btn-primary btn-sm">
+                <i class="fa fa-eye"></i> Ver
+            </a>
+
+            @if (Context.Session.GetInt32("UsuarioId") == novela.AutorId)
+            {
+                <a asp-action="Edit" asp-route-id="@novela.Id" class="btn btn-warning btn-sm">
+                    <i class="fa fa-edit"></i> Editar
+                </a>
+
+                <form asp-action="Delete" method="post" class="d-inline">
+                    <input type="hidden" name="id" value="@novela.Id" />
+                    <button type="submit" class="btn btn-danger btn-sm">
+                        <i class="fa fa-trash"></i> Eliminar
+                    </button>
+                </form>
+            }
+        </div>
+    </div>
+}
+

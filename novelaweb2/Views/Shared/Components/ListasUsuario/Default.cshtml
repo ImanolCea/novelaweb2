@@ -1,0 +1,15 @@
+﻿@model IEnumerable<novelaweb2.Models.Lista>
+@foreach (var lista in Model)
+{
+    <li>
+        <form asp-controller="Listas" asp-action="AgregarNovela" method="post">
+            <input type="hidden" name="listaId" value="@lista.Id" />
+            <input type="hidden" name="novelaId" value="@ViewBag.NovelaId" />
+            <button class="dropdown-item">@lista.Nombre</button>
+        </form>
+    </li>
+}
+@if (!Model.Any())
+{
+    <li><span class="dropdown-item text-muted">No tienes listas</span></li>
+}

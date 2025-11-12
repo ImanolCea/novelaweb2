@@ -159,5 +159,42 @@ namespace novelaweb2.Controllers
         {
             return _context.Usuarios.Any(e => e.Id == id);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> MisDatos()
+        {
+            var usuarioId = HttpContext.Session.GetInt32("UsuarioId");
+            if (usuarioId == null) return RedirectToAction("Login", "Auth");
+
+            var usuario = await _context.Usuarios.FindAsync(usuarioId);
+            if (usuario == null) return NotFound();
+
+            return View(usuario);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> MisDatos(Usuario model)
+        {
+            var usuarioId = HttpContext.Session.GetInt32("UsuarioId");
+            if (usuarioId == null || usuarioId != model.Id)
+                return Forbid();
+
+            if (ModelState.IsValid)
+            {
+                var usuario = await _context.Usuarios.FindAsync(model.Id);
+                if (usuario == null) return NotFound();
+
+                usuario.NombreUsuario = model.NombreUsuario;
+                usuario.Bio = model.Bio;
+                usuario.AvatarUrl = model.AvatarUrl;
+
+                await _context.SaveChangesAsync();
+                TempData["Success"] = "Datos actualizados correctamente.";
+                return RedirectToAction("MisDatos");
+            }
+            return View(model);
+        }
+
     }
 }

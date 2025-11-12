@@ -1,434 +1,376 @@
 ﻿/* ============================================================
-   🌙 site.css — Tema oscuro inspirado en WuxiaWorld
+   🌙 site.css — Tema completo estilo WuxiaWorld optimizado
    ============================================================ */
+
+/* Importar la fuente 'Inter' de Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 
 /* ===== Variables ===== */
 :root {
-    --bg: #202020;
-    --bg-elev: #151515;
-    --panel: #2b2b2b;
-    --muted: #B6B6B6;
-    --heading: #FFFFFF;
-    --accent: #127afe;
-    --border: #3c3c3c;
-    --glass: rgba(255,255,255,0.03);
-    --radius: 10px;
+    --bg: #1c1c1c;
+    --bg-elev: #232323;
+    --panel: #2e2e2e;
+    --text: #e6e6e6;
+    --muted: #aaa;
+    --heading: #fff;
+    --accent: #007bff; /* Un azul vibrante */
+    --border: #3a3a3a;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    --radius: 8px;
+    --font: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
     --max-width: 1200px;
-    --font: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    --transition-speed: 0.2s ease;
 }
 
-/* ============================================================
-   🔹 BASE GENERAL
-   ============================================================ */
-html, body {
+/* ===== Base general y Layout "Sticky Footer" ===== */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html {
     height: 100%;
-    background: var(--bg);
-    color: var(--muted);
-    font-family: var(--font);
-    font-size: 16px;
-    margin: 0;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth; /* Desplazamiento suave */
 }
 
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Ocupa al menos toda la altura de la pantalla */
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    transition: background-color .3s, color .3s;
+}
+
+/* El contenido principal empuja al footer hacia abajo */
+main {
+    flex: 1 0 auto; /* Permite que crezca y ocupe el espacio disponible */
+    width: 100%;
+    /* Recomendado: usa .container de Bootstrap dentro de <main> */
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius);
+}
+
+/* ===== Links ===== */
 a {
-    color: var(--muted);
+    color: var(--accent);
     text-decoration: none;
+    transition: color var(--transition-speed);
 }
 
     a:hover {
-        color: var(--accent);
-        text-decoration: none;
+        color: #66a8ff;
+        text-decoration: underline;
     }
 
-.max-1200 {
-    max-width: var(--max-width);
-    margin: 0 auto;
-}
+    /* Estilo de foco visible para accesibilidad */
+    a:focus-visible,
+    .btn:focus-visible,
+    .form-control:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+        box-shadow: none;
+    }
 
-/* ============================================================
-   🔹 HEADER / NAVBAR
-   ============================================================ */
-.site-header .navbar {
-    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0));
+/* ===== Navbar ===== */
+.navbar {
+    background: var(--bg-elev);
     border-bottom: 1px solid var(--border);
-    padding-top: 0.6rem;
-    padding-bottom: 0.6rem;
+    padding: 0.8rem 1rem;
+    box-shadow: var(--shadow);
+    position: sticky; /* Navbar fija al hacer scroll */
+    top: 0;
+    z-index: 1020;
 }
 
-.brand-icon {
-    color: var(--accent);
-}
-
-.brand-text {
-    color: var(--heading);
+.navbar-brand {
+    color: var(--heading) !important; /* Forzar color */
     font-weight: 700;
-    letter-spacing: 1.5px;
-    margin-left: 6px;
-    font-size: 1.05rem;
+    letter-spacing: 1px;
 }
 
-.navbar .nav-link {
-    color: var(--muted) !important;
+.nav-link {
+    color: var(--text) !important;
+    margin-right: 1rem;
     font-weight: 600;
-    margin-right: 0.25rem;
 }
 
-    .navbar .nav-link:hover {
+    .nav-link:hover,
+    .nav-link.active {
         color: var(--accent) !important;
     }
 
-/* 🔍 Búsqueda en header */
-.search-wrapper {
-    min-width: 180px;
-}
-
-.search-input {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    color: var(--muted);
-    border-radius: 999px;
-    padding: .35rem .9rem;
-    transition: width .25s ease, border-color .2s;
-}
-
-    .search-input:focus {
-        outline: none;
-        box-shadow: 0 0 0 0.12rem rgba(18,122,254,0.12);
-        border-color: var(--accent);
-        width: 260px;
-        background: #232323;
-    }
-
-/* 🔘 Botones */
-.btn-ghost {
-    background: transparent;
+/* ===== Botones ===== */
+.btn {
+    border-radius: var(--radius);
+    font-weight: 600;
+    transition: background .2s, color .2s, transform .1s, box-shadow .2s;
     border: 1px solid transparent;
-    color: var(--muted);
 }
+
+    .btn:active {
+        transform: scale(0.98); /* Efecto de presión */
+    }
 
 .btn-primary {
     background: var(--accent);
-    border: none;
-    color: white;
+    border-color: var(--accent);
+    color: #fff;
 }
 
     .btn-primary:hover {
-        background: #0f60d0;
+        background: #005fcc;
+        border-color: #005fcc;
+        color: #fff;
     }
 
-/* ============================================================
-   🔹 HERO PRINCIPAL
-   ============================================================ */
-.hero {
-    position: relative;
-    overflow: hidden;
-    height: 420px;
-    border-radius: 16px;
+.btn-secondary {
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid var(--border);
 }
 
-.hero-bg {
+    .btn-secondary:hover {
+        background: var(--border);
+        color: var(--text);
+    }
+
+/* ... (otros botones btn-warning, btn-danger) ... */
+
+/* ===== Botón de tema ===== */
+.btn-theme-toggle {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    color: var(--text);
+    font-size: 1.2rem; /* Aumentar ícono */
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+    .btn-theme-toggle:hover {
+        background: var(--accent);
+        color: #fff;
+        border-color: var(--accent);
+    }
+
+/* ===== Tarjetas (Cards) ===== */
+.card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    overflow: hidden; /* Asegura que la imagen respete el borde redondeado */
+}
+
+.card-header, .card-footer {
+    background-color: var(--bg-elev);
+    border-bottom: 1px solid var(--border);
+}
+
+.card-footer {
+    border-top: 1px solid var(--border);
+    border-bottom: 0;
+}
+
+/* En grillas de series / inicio */
+.card-novel .thumb {
+    height: 280px;
     width: 100%;
-    height: 100%;
+    object-fit: cover; /* Asegura que la imagen cubra el espacio */
+}
+
+/* En banners grandes */
+.hero-bg {
+    height: 380px !important;
+    width: 100%;
     object-fit: cover;
-    filter: brightness(0.35);
 }
 
-.hero-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, rgba(0,0,0,0.3), rgba(0,0,0,0.8));
+/* ===== Tablas ===== */
+.table {
+    color: var(--text);
+    background-color: var(--panel);
+    border-color: var(--border);
 }
 
-.hero-content {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    max-width: 700px;
+    .table th, .table td {
+        border-color: var(--border);
+    }
+
+    .table thead {
+        background: var(--bg-elev);
+        color: var(--heading);
+    }
+
+/* Estilo de fila hover para tema oscuro */
+.table-hover > tbody > tr:hover > * {
+    color: var(--heading);
+    background-color: var(--border);
 }
 
-/* ============================================================
-   🔹 GRID DE NOVELAS / CARDS
-   ============================================================ */
+/* ===== Formularios ===== */
+.form-control, .form-select {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: var(--radius);
+    transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+}
+
+    .form-control:focus, .form-select:focus {
+        background: var(--panel);
+        color: var(--text);
+        border-color: var(--accent);
+        box-shadow: 0 0 0 .2rem rgba(0,123,255,.25);
+    }
+
+    .form-control::placeholder {
+        color: var(--muted);
+    }
+
+/* ===== Secciones de detalles ===== */
 .section-title {
     color: var(--heading);
+    border-bottom: 2px solid var(--accent);
     margin-bottom: 1rem;
+    padding-bottom: .3rem;
     font-weight: 700;
 }
 
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 1.25rem;
+/* ===== Comentarios ===== */
+.comments-container {
+    background: var(--bg-elev);
+    border-radius: var(--radius);
+    padding: 1rem;
 }
 
-/* Card de novela */
-.card-novel {
-    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
+.comment-item {
+    background: var(--panel);
     border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-    transition: transform .18s ease, box-shadow .18s ease;
+    border-radius: var(--radius);
+    margin-bottom: .75rem;
+    padding: 1rem;
 }
 
-    .card-novel:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    .comment-item p {
+        margin-bottom: 0;
     }
 
-    .card-novel .thumb {
-        width: 100%;
-        height: 240px;
-        object-fit: cover;
-        display: block;
-    }
-
-    .card-novel .meta {
-        padding: .6rem .6rem .9rem;
-        text-align: center;
-    }
-
-        .card-novel .meta h5 {
-            margin: 0;
-            color: var(--heading);
-            font-size: 1rem;
-            font-weight: 700;
-        }
-
-        .card-novel .meta p {
-            margin: .35rem 0 0;
-            color: var(--muted);
-            font-size: .85rem;
-        }
-
-/* ============================================================
-   🔹 FORMULARIOS (Auth / Crear Novela / Capítulos)
-   ============================================================ */
-
-/* ---- Login / Registro ---- */
-.auth-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 80vh;
-    background: var(--bg);
-}
-
-.auth-card {
-    background-color: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 2rem 2.5rem;
-    width: 100%;
-    max-width: 420px;
-    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.5);
-}
-
-    .auth-card h2 {
-        color: var(--heading);
-        text-align: center;
-        margin-bottom: 1.5rem;
-        font-weight: 700;
-    }
-
-    .auth-card label {
-        color: var(--heading);
-        font-weight: 500;
-    }
-
-    .auth-card .form-control {
-        background-color: #2a2a2a;
-        border: 1px solid var(--border);
-        color: var(--heading);
-        border-radius: 6px;
-        padding: 0.6rem 1rem;
-    }
-
-        .auth-card .form-control:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 0.15rem rgba(18, 122, 254, 0.25);
-        }
-
-    .auth-card .btn-primary {
-        background-color: var(--accent);
-        border: none;
-        padding: 0.6rem;
-        border-radius: 6px;
-        font-weight: 600;
-    }
-
-        .auth-card .btn-primary:hover {
-            background-color: #0e63db;
-        }
-
-    .auth-card a {
-        color: var(--accent);
-        text-decoration: none;
-    }
-
-/* ---- Crear Novela ---- */
-.novela-create-container {
-    max-width: 850px;
-    margin: 0 auto;
-    padding-top: 2rem;
-}
-
-.form-control-dark, .form-select.form-control-dark {
-    background-color: #1f1f1f;
-    border: 1px solid #343434;
-    color: #eaeaea;
-    border-radius: 8px;
-    padding: 0.6rem 0.8rem;
-}
-
-    .form-control-dark:focus {
-        border-color: #127afe;
-        box-shadow: 0 0 0 0.15rem rgba(18, 122, 254, 0.25);
-        outline: none;
-    }
-
-.card.bg-dark.text-light {
-    background-color: #141414 !important;
-    border: 1px solid #2c2c2c !important;
-}
-
-/* ---- Crear Capítulo ---- */
-.capitulo-form-container {
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-    .capitulo-form-container .card {
-        background-color: #1e1e1e;
-        border: 1px solid #333;
-        border-radius: 10px;
-    }
-
-    .capitulo-form-container .form-control {
-        background-color: #2b2b2b;
-        border: 1px solid #444;
-        color: #eee;
-        border-radius: 6px;
-    }
-
-        .capitulo-form-container .form-control:focus {
-            border-color: #0d6efd;
-            box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25);
-        }
-
-/* ============================================================
-   🔹 MENÚ DE USUARIO
-   ============================================================ */
-.user-menu {
-    position: relative;
-}
-
-    .user-menu .dropdown-toggle {
-        color: #f8f9fa;
-        text-decoration: none;
-        font-weight: 500;
-    }
-
-        .user-menu .dropdown-toggle:hover {
-            color: var(--accent);
-        }
-
-    .user-menu .fa-user {
-        color: var(--accent);
-    }
-
-.dropdown-menu-dark {
-    background-color: #2a2a2a;
-    border: 1px solid #444;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-}
-
-    .dropdown-menu-dark .dropdown-item {
-        color: #eee;
-        font-weight: 500;
-    }
-
-        .dropdown-menu-dark .dropdown-item:hover {
-            background-color: #3b3b3b;
-            color: var(--accent);
-        }
-
-    .dropdown-menu-dark .dropdown-divider {
-        border-top: 1px solid #555;
-    }
-
-/* ============================================================
-   🔹 FOOTER
-   ============================================================ */
-.site-footer {
+/* ===== Footer ===== */
+footer {
+    margin-top: auto; /* Se asegura de estar al final */
     border-top: 1px solid var(--border);
     background: var(--bg-elev);
     color: var(--muted);
+    padding: 1.5rem 1rem; /* Más espaciado */
+    text-align: center;
 }
 
-/* ============================================================
-   🔹 RESPONSIVE
-   ============================================================ */
-@media (max-width: 991.98px) {
-    .hero .hero-bg {
-        height: 300px;
-    }
-
-    .hero .hero-content {
-        left: 24px;
-        bottom: 20px;
-        max-width: 60%;
-    }
-
-    .search-wrapper {
-        min-width: 120px;
-    }
+/* =====================
+   ===== LIGHT THEME =====
+   ===================== */
+body.theme-light {
+    --bg: #f8f9fa;
+    --bg-elev: #ffffff;
+    --panel: #ffffff;
+    --text: #212529;
+    --muted: #6c757d;
+    --heading: #000;
+    --accent: #007bff;
+    --border: #dee2e6;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-@media (max-width: 575.98px) {
-    .hero .hero-bg {
-        height: 220px;
+    body.theme-light .navbar,
+    body.theme-light footer {
+        background: #fff;
+        border-color: #ddd;
     }
 
-    .hero .hero-content {
-        left: 18px;
-        bottom: 12px;
-        max-width: 72%;
+    body.theme-light .card {
+        background: #fff;
+        color: var(--text);
+        border-color: #ddd;
     }
 
-    .grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: .75rem;
+    body.theme-light .card-header,
+    body.theme-light .card-footer {
+        background-color: #f7f7f7;
+        border-color: #ddd;
     }
 
-    .brand-text {
-        display: none;
+    body.theme-light .btn-secondary {
+        background: #e9ecef;
+        color: #000;
+        border-color: #ccc;
     }
-}
-.pagination .page-link {
-    background-color: #1f1f1f;
-    color: #ccc;
-    border: 1px solid #333;
-}
 
-.pagination .page-item.active .page-link {
-    background-color: #127afe;
-    border-color: #127afe;
-    color: white;
-}
-.dropdown-menu-dark {
-    background-color: #1f1f1f;
-    border: 1px solid #333;
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.6);
-}
+        body.theme-light .btn-secondary:hover {
+            background: #d1d5da;
+        }
 
-.dropdown-item.text-warning:hover {
-    color: #ffcc00 !important;
-}
+    body.theme-light .btn-theme-toggle {
+        background: #fff;
+        color: #000;
+        border-color: #ccc;
+    }
 
-.dropdown-item.text-danger:hover {
-    color: #ff5c5c !important;
+    body.theme-light .comments-container {
+        background: #f1f3f5;
+    }
+
+    body.theme-light .table {
+        background-color: #fff;
+        border-color: #ddd;
+    }
+
+        body.theme-light .table th,
+        body.theme-light .table td {
+            border-color: #ddd;
+        }
+
+    body.theme-light .table-hover > tbody > tr:hover > * {
+        color: var(--text);
+        background-color: #f5f5f5;
+    }
+
+    body.theme-light .form-control,
+    body.theme-light .form-select {
+        background: #fff;
+        border-color: #ccc;
+        color: var(--text);
+    }
+
+        body.theme-light .form-control:focus,
+        body.theme-light .form-select:focus {
+            background: #fff;
+        }
+
+/* ===== Responsivo ===== */
+@media (max-width: 768px) {
+    .navbar-nav {
+        text-align: center;
+        margin-top: 1rem;
+    }
+
+    .navbar-collapse {
+        width: 100%;
+    }
+
+    /* Asumo que .chapter-item es una lista de capítulos */
+    .chapter-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 }

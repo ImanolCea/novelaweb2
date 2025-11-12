@@ -1,124 +1,96 @@
-﻿@{
-    Layout = null;
+﻿@using Microsoft.AspNetCore.Http
+@{
+    var usuarioNombre = Context.Session.GetString("UsuarioNombre");
+    var rol = Context.Session.GetString("Rol");
 }
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - novelaweb2</title>
+    <title>@ViewData["Title"] - Web Novelas</title>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-
-    <!-- Fuente -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-    <!-- CSS del proyecto (reemplaza con el nuevo sitio oscuro) -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <!-- Si necesitas mantener novelaweb2.styles.css; lo dejamos (puedes combinar luego) -->
-    <link rel="stylesheet" href="~/novelaweb2.styles.css" asp-append-version="true" />
+    <script src="https://kit.fontawesome.com/6ab590c83b.js" crossorigin="anonymous"></script>
+
+    <script src="~/js/theme.js" asp-append-version="true"></script>
 </head>
-<body>
-    <header class="site-header">
-        <nav class="navbar navbar-expand-lg navbar-dark container-fluid px-3">
-            <div class="container max-1200 d-flex align-items-center">
-                <a class="navbar-brand d-flex align-items-center gap-2" asp-area="" asp-controller="Home" asp-action="Index">
-                    <!-- icono simple SVG -->
-                    <svg width="28" height="32" viewBox="0 0 24 28" fill="none" xmlns="http://www.w3.org/2000/svg" class="brand-icon">
-                        <path d="M12 0L24 28H0L12 0Z" fill="currentColor" />
-                    </svg>
-                    <span class="brand-text">NOVELAWEB</span>
+
+<body class="d-flex flex-column min-vh-100">
+    <header class="site-header mb-4">
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container-fluid max-1200">
+                <a class="navbar-brand d-flex align-items-center" asp-controller="Home" asp-action="Index">
+                    <i class="fas fa-book-open brand-icon"></i>
+                    <span class="brand-text">WEB NOVELAS</span>
                 </a>
 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
-                        aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
-                <div class="collapse navbar-collapse" id="mainNavbar">
+                <div class="collapse navbar-collapse justify-content-between" id="mainNav">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Inicio</a></li>
-                        <li class="nav-item"><a class="nav-link" asp-controller="Novelas" asp-action="Index">Series</a></li>
-                        <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Privacy">Privacidad</a></li>
-              
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="resourcesDropdown" role="button"
-                               data-bs-toggle="dropdown" aria-expanded="false">
-                                Administracion
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="resourcesDropdown">
-                                
-                                <li class="nav-item"><a class="nav-link" asp-controller="Roles" asp-action="Index">Roles</a></li>
-                                <li class="nav-item"><a class="nav-link" asp-controller="usuarios" asp-action="Index">Usuarios</a></li>
-                                <li class="nav-item"><a class="nav-link" asp-controller="Etiquetas" asp-action="Index">Etiquetas</a></li>
-                                <li class="nav-item"><a class="nav-link" asp-controller="Novelas" asp-action="Index">Novelas</a></li>
-                            </ul>
-                        </li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index">Inicio</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Novelas" asp-action="Series">Series</a></li>
+                        <li class="nav-item"><a class="nav-link" asp-controller="Seguimientoes" asp-action="MisBookmarks">Mis bookmarks</a></li>
+
+                        @if (Context.Session.GetString("Rol") == "Administrador" || Context.Session.GetString("Rol") == "Moderador")
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-warning" asp-controller="Admin" asp-action="Index">
+                                    <i class="fa-solid fa-shield-halved me-1"></i> Administración
+                                </a>
+                            </li>
+                        }
                     </ul>
 
-                    <form class="d-flex align-items-center header-actions" role="search" onsubmit="return false;">
-                        <div class="me-3 search-wrapper">
-                            <input class="form-control search-input" type="search" placeholder="Buscar..." aria-label="Buscar">
-                        </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <button class="btn-theme-toggle" onclick="toggleTheme()" title="Cambiar modo claro/oscuro">
+                            <i class="fa-solid" id="theme-icon"></i>
+                        </button>
 
-                        @{
-                            var usuarioNombre = Context.Session.GetString("UsuarioNombre");
-                        }
-
-                        @if (string.IsNullOrEmpty(usuarioNombre))
+                        @if (Context.Session.GetString("UsuarioNombre") != null)
                         {
-                            <!-- Si no hay sesión, mostrar botones de login/registro -->
-                            <div class="me-2">
-                                <a class="btn btn-sm btn-ghost" asp-controller="Auth" asp-action="Login">Iniciar sesión</a>
-                            </div>
-                            <div>
-                                <a class="btn btn-sm btn-primary" asp-controller="Auth" asp-action="Register">Registrarse</a>
-                            </div>
-                        }
-                        else
-                        {
-                            <!-- Si el usuario está logueado, mostrar icono con menú -->
                             <div class="dropdown user-menu">
-                                <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button"
-                                   data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fa-solid fa-user fa-lg me-2"></i>
-                                    <span>@usuarioNombre</span>
+                                <a class="dropdown-toggle text-light" href="#" data-bs-toggle="dropdown">
+                                    <i class="fa fa-user me-1"></i> @Context.Session.GetString("UsuarioNombre")
                                 </a>
-                                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark">
-                                    <li><a class="dropdown-item" asp-controller="Usuarios" asp-action="Details" asp-route-id="@Context.Session.GetInt32("UsuarioId")">Mis datos</a></li>
-                                    <li><a class="dropdown-item" asp-controller="Listas" asp-action="Index">Mis listas</a></li>
-                                    <li><a class="dropdown-item" asp-controller="Novelas" asp-action="Index">Mis libros</a></li>
+                                <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+                                    <li><a class="dropdown-item" asp-controller="Usuarios" asp-action="MisDatos">Mis datos</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Listas" asp-action="MisListas">Mis listas</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Novelas" asp-action="MisNovelas">Mis novelas</a></li>
                                     <li><hr class="dropdown-divider" /></li>
                                     <li><a class="dropdown-item text-danger" asp-controller="Auth" asp-action="Logout">Cerrar sesión</a></li>
                                 </ul>
                             </div>
                         }
-
-                    </form>
+                        else
+                        {
+                            <a class="btn btn-primary btn-sm" asp-controller="Auth" asp-action="Login">Iniciar sesión</a>
+                            <a class-"btn btn-ghost btn-sm" asp-controller="Auth" asp-action="Register">Registrarse</a>
+                        }
+                    </div>
                 </div>
             </div>
         </nav>
     </header>
 
-    <!-- Contenido principal -->
-    <div class="container max-1200 my-4">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <!-- Footer -->
-    <footer class="site-footer mt-5">
-        <div class="container max-1200 py-4 text-center">
-            <small>&copy; 2025 - novelaweb2 —</small>
+    <main role="main" class="pb-4">
+        <div class="container-fluid px-3 px-md-4">
+            @RenderBody()
         </div>
+    </main>
+
+    <footer class="site-footer text-center mt-auto py-3">
+        <p>© @(DateTime.Now.Year) Web Novelas — Todos los derechos reservados</p>
     </footer>
 
-    <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+
+    @RenderSection("Scripts", required: false)
 </body>
 </html>
-

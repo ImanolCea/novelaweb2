@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using novelaweb2.Models;
@@ -18,146 +14,131 @@ namespace novelaweb2.Controllers
             _context = context;
         }
 
-        // GET: Listas
-        public async Task<IActionResult> Index()
+        // ====================== MIS LISTAS ======================
+        public async Task<IActionResult> MisListas()
         {
-            var webNovelasDbContext = _context.Listas.Include(l => l.Usuario);
-            return View(await webNovelasDbContext.ToListAsync());
+            var usuarioId = HttpContext.Session.GetInt32("UsuarioId");
+            if (usuarioId == null) return RedirectToAction("Login", "Auth");
+
+            var listas = await _context.Listas
+                .Where(l => l.UsuarioId == usuarioId)
+                .Include(l => l.ListaNovelas).ThenInclude(ln => ln.Novela)
+                .OrderByDescending(l => l.FechaCreacion)
+                .ToListAsync();
+
+            return View(listas);
         }
 
-        // GET: Listas/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var lista = await _context.Listas
-                .Include(l => l.Usuario)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (lista == null)
-            {
-                return NotFound();
-            }
-
-            return View(lista);
-        }
-
-        // GET: Listas/Create
+        // ====================== CREAR LISTA ======================
+        [HttpGet]
         public IActionResult Create()
         {
-            ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Id");
             return View();
         }
 
-        // POST: Listas/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,UsuarioId,Nombre,Descripcion,FechaCreacion")] Lista lista)
+        public async Task<IActionResult> Create([Bind("Nombre,Descripcion")] Lista lista)
         {
+            var usuarioId = HttpContext.Session.GetInt32("UsuarioId");
+            if (usuarioId == null) return RedirectToAction("Login", "Auth");
+
             if (ModelState.IsValid)
             {
+                lista.UsuarioId = usuarioId.Value;
+                lista.FechaCreacion = DateTime.Now;
                 _context.Add(lista);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                TempData["Success"] = "Lista creada correctamente.";
+                return RedirectToAction(nameof(MisListas));
             }
-            ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Id", lista.UsuarioId);
             return View(lista);
         }
 
-        // GET: Listas/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        // ====================== DETALLES DE UNA LISTA ======================
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var lista = await _context.Listas.FindAsync(id);
-            if (lista == null)
-            {
-                return NotFound();
-            }
-            ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Id", lista.UsuarioId);
-            return View(lista);
-        }
-
-        // POST: Listas/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,UsuarioId,Nombre,Descripcion,FechaCreacion")] Lista lista)
-        {
-            if (id != lista.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(lista);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ListaExists(lista.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Id", lista.UsuarioId);
-            return View(lista);
-        }
-
-        // GET: Listas/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            var usuarioId = HttpContext.Session.GetInt32("UsuarioId");
+            if (usuarioId == null) return RedirectToAction("Login", "Auth");
 
             var lista = await _context.Listas
-                .Include(l => l.Usuario)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (lista == null)
-            {
-                return NotFound();
-            }
+                .Include(l => l.ListaNovelas)
+                .ThenInclude(ln => ln.Novela)
+                .FirstOrDefaultAsync(l => l.Id == id && l.UsuarioId == usuarioId);
+
+            if (lista == null) return NotFound();
 
             return View(lista);
         }
 
-        // POST: Listas/Delete/5
-        [HttpPost, ActionName("Delete")]
+        // ====================== ELIMINAR LISTA ======================
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var lista = await _context.Listas.FindAsync(id);
-            if (lista != null)
-            {
-                _context.Listas.Remove(lista);
-            }
+            var usuarioId = HttpContext.Session.GetInt32("UsuarioId");
+            if (usuarioId == null) return RedirectToAction("Login", "Auth");
 
+            var lista = await _context.Listas.FirstOrDefaultAsync(l => l.Id == id && l.UsuarioId == usuarioId);
+            if (lista == null) return NotFound();
+
+            _context.Listas.Remove(lista);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            TempData["Success"] = "Lista eliminada correctamente.";
+            return RedirectToAction(nameof(MisListas));
         }
 
-        private bool ListaExists(int id)
+        // ====================== AÑADIR NOVELA ======================
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AgregarNovela(int listaId, int novelaId)
         {
-            return _context.Listas.Any(e => e.Id == id);
+            var usuarioId = HttpContext.Session.GetInt32("UsuarioId");
+            if (usuarioId == null) return RedirectToAction("Login", "Auth");
+
+            var lista = await _context.Listas
+                .FirstOrDefaultAsync(l => l.Id == listaId && l.UsuarioId == usuarioId);
+            if (lista == null) return NotFound();
+
+            bool existe = await _context.ListaNovelas
+                .AnyAsync(ln => ln.ListaId == listaId && ln.NovelaId == novelaId);
+
+            if (!existe)
+            {
+                var nueva = new ListaNovela
+                {
+                    ListaId = listaId,
+                    NovelaId = novelaId,
+                    FechaAgregado = DateTime.Now
+                };
+                _context.ListaNovelas.Add(nueva);
+                await _context.SaveChangesAsync();
+            }
+
+            TempData["Success"] = "Novela añadida a la lista.";
+            return RedirectToAction("Details", "Novelas", new { id = novelaId });
+        }
+
+        // ====================== ELIMINAR NOVELA DE LISTA ======================
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EliminarNovela(int listaId, int novelaId)
+        {
+            var usuarioId = HttpContext.Session.GetInt32("UsuarioId");
+            if (usuarioId == null) return RedirectToAction("Login", "Auth");
+
+            var ln = await _context.ListaNovelas
+                .Include(x => x.Lista)
+                .FirstOrDefaultAsync(x => x.ListaId == listaId && x.NovelaId == novelaId && x.Lista.UsuarioId == usuarioId);
+
+            if (ln != null)
+            {
+                _context.ListaNovelas.Remove(ln);
+                await _context.SaveChangesAsync();
+            }
+
+            TempData["Success"] = "Novela eliminada de la lista.";
+            return RedirectToAction("Details", new { id = listaId });
         }
     }
 }

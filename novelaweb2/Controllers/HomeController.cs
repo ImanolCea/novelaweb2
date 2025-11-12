@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using novelaweb2.Models;
 using System.Diagnostics;
@@ -9,7 +9,7 @@ namespace novelaweb2.Controllers
     {
         private readonly WebNovelasDbContext _context;
         private readonly ILogger<HomeController> _logger;
-        private const int PageSize = 8; // n�mero de novelas por p�gina
+        private const int PageSize = 30; // ✅ 30 por página
 
         public HomeController(ILogger<HomeController> logger, WebNovelasDbContext context)
         {
@@ -17,20 +17,37 @@ namespace novelaweb2.Controllers
             _context = context;
         }
 
+        // Última actualización = Max(fecha cap) o fecha publicación si no tiene caps
         public async Task<IActionResult> Index(int page = 1)
         {
-            var totalNovelas = await _context.Novelas.CountAsync();
+            var baseQuery = _context.Novelas
+                .Select(n => new
+                {
+                    Novela = n,
+                    UltimaActualizacion = n.Capitulos.Any()
+                        ? n.Capitulos.Max(c => c.FechaPublicacion)
+                        : n.FechaPublicacion
+                });
 
-            var novelas = await _context.Novelas
-                .Include(n => n.Capitulos)
-                .OrderByDescending(n => n.FechaPublicacion)
+            var total = await baseQuery.CountAsync();
+
+            var novelas = await baseQuery
+                .OrderByDescending(x => x.UltimaActualizacion)
                 .Skip((page - 1) * PageSize)
                 .Take(PageSize)
+                .Select(x => x.Novela)
+                .Include(n => n.Capitulos)
                 .ToListAsync();
 
-            ViewBag.CurrentPage = page;
-            ViewBag.TotalPages = (int)Math.Ceiling(totalNovelas / (double)PageSize);
+            // “Destacadas”: las 5 con más reseñas (placeholder simple)
+            var destacadas = await _context.Novelas
+                .OrderByDescending(n => n.Reseñas.Count)
+                .Take(5)
+                .ToListAsync();
 
+            ViewBag.Destacadas = destacadas;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = (int)Math.Ceiling(total / (double)PageSize);
             return View(novelas);
         }
 

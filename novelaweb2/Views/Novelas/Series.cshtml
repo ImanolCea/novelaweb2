@@ -1,0 +1,93 @@
+﻿@model IEnumerable<novelaweb2.Models.Novela>
+@{
+    ViewData["Title"] = "Series";
+    var current = ViewBag.CurrentPage ?? 1;
+    var total = ViewBag.TotalPages ?? 1;
+    var q = ViewBag.FiltroQ as string;
+    var genero = ViewBag.FiltroGenero as string;
+    var estado = ViewBag.FiltroEstado as string;
+    var calMin = ViewBag.FiltroCalificacion as int?;
+    var generos = ViewBag.Generos as List<string> ?? new();
+    var estados = ViewBag.Estados as string[] ?? Array.Empty<string>();
+}
+
+<div class="max-1200 row">
+    <aside class="col-lg-3 mb-3">
+        <div class="card p-3 bg-dark text-light">
+            <h5 class="mb-3">Buscar / Filtrar</h5>
+            <form method="get" asp-action="Series">
+                <div class="mb-2">
+                    <label class="form-label">Nombre</label>
+                    <input name="q" class="form-control form-control-dark" value="@q" />
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Género</label>
+                    <select name="genero" class="form-select form-control-dark">
+                        <option value="">-- Todos --</option>
+                        @foreach (var g in generos)
+                        {
+                            <option value="@g" selected="@(g == genero)">@g</option>
+                        }
+                    </select>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Estado</label>
+                    <select name="estado" class="form-select form-control-dark">
+                        <option value="">-- Todos --</option>
+                        @foreach (var e in estados)
+                        {
+                            <option value="@e" selected="@(e == estado)">@e</option>
+                        }
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Calificación mínima</label>
+                    <select name="calificacionMin" class="form-select form-control-dark">
+                        <option value="">-- Ninguna --</option>
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            <option value="@i" selected="@(calMin == i)">@i+</option>
+                        }
+                    </select>
+                </div>
+                <button class="btn btn-primary w-100">Filtrar</button>
+            </form>
+        </div>
+    </aside>
+
+    <section class="col-lg-9">
+        <h3 class="section-title">Todas las series</h3>
+        <div class="grid">
+            @foreach (var n in Model)
+            {
+                <a class="card-novel" asp-controller="Novelas" asp-action="Details" asp-route-id="@n.Id">
+                    <img class="thumb" src="@(string.IsNullOrWhiteSpace(n.PortadaUrl) ? "https://picsum.photos/400/600?grayscale" : n.PortadaUrl)" alt="@n.Titulo" />
+                    <div class="meta">
+                        <h5>@n.Titulo</h5>
+                        <p>@(n.Genero ?? "—") • @(n.Estado)</p>
+                    </div>
+                </a>
+            }
+        </div>
+
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                <li class="page-item @(current <= 1 ? "disabled" : "")">
+                    <a class="page-link" asp-action="Series" asp-route-page="@(current - 1)"
+                       asp-route-q="@q" asp-route-genero="@genero" asp-route-estado="@estado" asp-route-calificacionMin="@calMin">Anterior</a>
+                </li>
+                @for (int p = 1; p <= total; p++)
+                {
+                    <li class="page-item @(p == current ? "active" : "")">
+                        <a class="page-link" asp-action="Series" asp-route-page="@p"
+                           asp-route-q="@q" asp-route-genero="@genero" asp-route-estado="@estado" asp-route-calificacionMin="@calMin">@p</a>
+                    </li>
+                }
+                <li class="page-item @(current >= total ? "disabled" : "")">
+                    <a class="page-link" asp-action="Series" asp-route-page="@(current + 1)"
+                       asp-route-q="@q" asp-route-genero="@genero" asp-route-estado="@estado" asp-route-calificacionMin="@calMin">Siguiente</a>
+                </li>
+            </ul>
+        </nav>
+    </section>
+</div>

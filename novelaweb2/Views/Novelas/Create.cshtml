@@ -1,92 +1,46 @@
-﻿@{
-    ViewData["Title"] = "Crear nueva novela";
+﻿@model novelaweb2.Models.Capitulo
+@{
+    ViewData["Title"] = "Nuevo Capítulo";
 }
 
-<div class="novela-create-container">
-    <div class="card bg-dark text-light p-4 shadow-lg border-0 rounded-4">
-        <h2 class="mb-4 text-center"><i class="fa-solid fa-book-open me-2 text-primary"></i> Crear Nueva Novela</h2>
+<div class="capitulo-form-container">
+    <div class="card bg-dark text-light p-4">
+        <h2 class="mb-4 text-center">Agregar nuevo capítulo</h2>
 
-        @if (ViewBag.Error != null)
+        @if (TempData["Error"] != null)
         {
-            <div class="alert alert-danger">@ViewBag.Error</div>
+            <div class="alert alert-danger">@TempData["Error"]</div>
         }
 
         <form asp-action="Create" method="post">
-            <!-- Datos de la novela -->
-            <div class="mb-4">
-                <h5 class="border-bottom border-secondary pb-2 mb-3 text-uppercase text-muted">Información de la novela</h5>
+            <input type="hidden" name="NovelaId" value="@ViewBag.NovelaId" />
 
-                <div class="mb-3">
-                    <label class="form-label">Título *</label>
-                    <input name="titulo" class="form-control form-control-dark" required />
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Sinopsis</label>
-                    <textarea name="sinopsis" rows="3" class="form-control form-control-dark"></textarea>
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Portada (URL de imagen)</label>
-                    <input name="portadaUrl" class="form-control form-control-dark" placeholder="https://..." />
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Género</label>
-                    <select name="genero" class="form-select form-control-dark">
-                        <option value="">Selecciona un género</option>
-                        <option value="Acción">Acción</option>
-                        <option value="Aventura">Aventura</option>
-                        <option value="Romance">Romance</option>
-                        <option value="Fantasía">Fantasía</option>
-                        <option value="Ciencia Ficción">Ciencia Ficción</option>
-                        <option value="Comedia">Comedia</option>
-                        <option value="Drama">Drama</option>
-                        <option value="Misterio">Misterio</option>
-                    </select>
-                </div>
+            <div class="mb-3">
+                <label asp-for="NumeroCapitulo" class="form-label">Número de Capítulo</label>
+                <input asp-for="NumeroCapitulo" class="form-control" />
+                <span asp-validation-for="NumeroCapitulo" class="text-danger"></span>
             </div>
 
-            <!-- Primer capítulo -->
-            <div class="mb-4">
-                <h5 class="border-bottom border-secondary pb-2 mb-3 text-uppercase text-muted">
-                    Primer capítulo
-                </h5>
-
-                <div class="mb-3">
-                    <label class="form-label">Título del capítulo *</label>
-                    <input name="capituloTitulo" class="form-control form-control-dark" required />
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Contenido *</label>
-                    <textarea name="capituloContenido" rows="10" class="form-control form-control-dark" required></textarea>
-                    <small class="text-muted">Introduce al menos unas pocas líneas para iniciar la novela.</small>
-                </div>
+            <div class="mb-3">
+                <label asp-for="Titulo" class="form-label">Título</label>
+                <input asp-for="Titulo" class="form-control" />
+                <span asp-validation-for="Titulo" class="text-danger"></span>
             </div>
 
-            <!-- Botón -->
-            <div class="text-center mt-4">
-                <button type="submit" class="btn btn-primary px-5 py-2">
-                    <i class="fa-solid fa-cloud-arrow-up me-2"></i> Publicar novela y capítulo
-                </button>
+            <div class="mb-3">
+                <label asp-for="Contenido" class="form-label">Contenido</label>
+                <textarea asp-for="Contenido" class="form-control" rows="10"></textarea>
+                <span asp-validation-for="Contenido" class="text-danger"></span>
+            </div>
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary px-4">Guardar capítulo</button>
+                <a asp-controller="Novelas" asp-action="Details" asp-route-id="@ViewBag.NovelaId" class="btn btn-secondary ms-2">Volver</a>
             </div>
         </form>
     </div>
 </div>
 
 @section Scripts {
-    <script>
-        // Contador de palabras en tiempo real
-        const textarea = document.querySelector('textarea[name="capituloContenido"]');
-        if (textarea) {
-            const counter = document.createElement('small');
-            counter.classList.add('text-muted', 'd-block', 'mt-1');
-            textarea.parentElement.appendChild(counter);
-            textarea.addEventListener('input', () => {
-                const count = textarea.value.trim().split(/\s+/).filter(w => w.length).length;
-                counter.textContent = `${count} palabras`;
-            });
-        }
-    </script>
+    <partial name="_ValidationScriptsPartial" />
 }

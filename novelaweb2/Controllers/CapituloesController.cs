@@ -14,7 +14,7 @@ namespace novelaweb2.Controllers
             _context = context;
         }
 
-        // =================== VER CAPÍTULO ===================
+        // GET: Capituloes/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -27,71 +27,142 @@ namespace novelaweb2.Controllers
             if (capitulo == null)
                 return NotFound();
 
-            var novela = capitulo.Novela;
+            // Cargar capítulos anterior y siguiente
+            var anterior = await _context.Capitulos
+                .Where(c => c.NovelaId == capitulo.NovelaId && c.NumeroCapitulo < capitulo.NumeroCapitulo)
+                .OrderByDescending(c => c.NumeroCapitulo)
+                .FirstOrDefaultAsync();
 
-            var capitulos = await _context.Capitulos
-                .Where(c => c.NovelaId == novela.Id)
+            var siguiente = await _context.Capitulos
+                .Where(c => c.NovelaId == capitulo.NovelaId && c.NumeroCapitulo > capitulo.NumeroCapitulo)
                 .OrderBy(c => c.NumeroCapitulo)
-                .ToListAsync();
+                .FirstOrDefaultAsync();
 
-            var usuarioId = HttpContext.Session.GetInt32("UsuarioId");
-            ViewBag.UsuarioId = usuarioId;
-            ViewBag.NombreUsuario = HttpContext.Session.GetString("NombreUsuario");
-
-
-            var comentarios = await _context.Comentarios
-                .Where(x => x.CapituloId == id)
-                .Include(x => x.Usuario)
-                .OrderByDescending(x => x.Fecha)
-                .ToListAsync();
-
-            ViewBag.Comentarios = comentarios;
+            ViewBag.CapituloAnterior = anterior;
+            ViewBag.CapituloSiguiente = siguiente;
 
             return View(capitulo);
         }
 
-        // =================== CREAR CAPÍTULO ===================
+        // GET: Capituloes/Create
         public IActionResult Create(int novelaId)
         {
-            var usuarioId = HttpContext.Session.GetInt32("UsuarioId");
-            var novela = _context.Novelas.FirstOrDefault(n => n.Id == novelaId);
-
-            if (novela == null || novela.AutorId != usuarioId)
-                return Forbid();
-
-            ViewBag.Novela = novela;
-            return View(new Capitulo { NovelaId = novelaId });
+            ViewBag.NovelaId = novelaId;
+            return View();
         }
 
+        // POST: Capituloes/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("NovelaId,NumeroCapitulo,Titulo,Contenido")] Capitulo capitulo)
+        public async Task<IActionResult> Create(Capitulo capitulo)
         {
-            var usuarioId = HttpContext.Session.GetInt32("UsuarioId");
-            var novela = await _context.Novelas.FirstOrDefaultAsync(n => n.Id == capitulo.NovelaId);
-
-            if (novela == null || novela.AutorId != usuarioId)
-                return Forbid();
-
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                capitulo.FechaPublicacion = DateTime.Now;
-                capitulo.Palabras = capitulo.Contenido.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length;
-
-                _context.Add(capitulo);
-                await _context.SaveChangesAsync();
-
-                // actualizar total de palabras
-                novela.PalabrasTotales = await _context.Capitulos
-                    .Where(c => c.NovelaId == novela.Id)
-                    .SumAsync(c => c.Palabras);
-                await _context.SaveChangesAsync();
-
-                return RedirectToAction("Details", "Novelas", new { id = novela.Id });
+                ViewBag.NovelaId = capitulo.NovelaId;
+                return View(capitulo);
             }
 
-            ViewBag.Novela = novela;
+            // ✅ Validar número de capítulo único
+            bool existeNumero = await _context.Capitulos
+                .AnyAsync(c => c.NovelaId == capitulo.NovelaId && c.NumeroCapitulo == capitulo.NumeroCapitulo);
+
+            if (existeNumero)
+            {
+                ModelState.AddModelError("NumeroCapitulo", "Ya existe un capítulo con este número.");
+                ViewBag.NovelaId = capitulo.NovelaId;
+                return View(capitulo);
+            }
+
+            // ✅ Validar orden
+            var maxCap = await _context.Capitulos
+                .Where(c => c.NovelaId == capitulo.NovelaId)
+                .MaxAsync(c => (int?)c.NumeroCapitulo) ?? 0;
+
+            if (capitulo.NumeroCapitulo < maxCap + 1)
+            {
+                ModelState.AddModelError("NumeroCapitulo", $"El número de capítulo debe ser mayor o igual a {maxCap + 1}.");
+                ViewBag.NovelaId = capitulo.NovelaId;
+                return View(capitulo);
+            }
+
+            // Calcular cantidad de palabras
+            capitulo.Palabras = capitulo.Contenido?.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length ?? 0;
+            capitulo.FechaPublicacion = DateTime.Now;
+
+            _context.Add(capitulo);
+            await _context.SaveChangesAsync();
+
+            // Actualizar palabras totales de la novela
+            var novela = await _context.Novelas.FirstOrDefaultAsync(n => n.Id == capitulo.NovelaId);
+            if (novela != null)
+            {
+                novela.PalabrasTotales = await _context.Capitulos
+                    .Where(c => c.NovelaId == capitulo.NovelaId)
+                    .SumAsync(c => c.Palabras);
+                _context.Update(novela);
+                await _context.SaveChangesAsync();
+            }
+
+            TempData["Success"] = "Capítulo agregado correctamente.";
+            return RedirectToAction("Details", "Novelas", new { id = capitulo.NovelaId });
+        }
+        // GET: Capituloes/Edit/5
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var capitulo = await _context.Capitulos.Include(c => c.Novela).FirstOrDefaultAsync(c => c.Id == id);
+            if (capitulo == null) return NotFound();
+
+            var usuarioNombre = HttpContext.Session.GetString("UsuarioNombre");
+            if (usuarioNombre != capitulo.Novela?.Autor?.NombreUsuario)
+                return Unauthorized();
+
             return View(capitulo);
         }
+
+        // POST: Capituloes/Edit
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, Capitulo capitulo)
+        {
+            if (id != capitulo.Id) return NotFound();
+
+            var original = await _context.Capitulos.Include(c => c.Novela).FirstOrDefaultAsync(c => c.Id == id);
+            if (original == null) return NotFound();
+
+            var usuarioNombre = HttpContext.Session.GetString("UsuarioNombre");
+            if (usuarioNombre != original.Novela?.Autor?.NombreUsuario)
+                return Unauthorized();
+
+            original.Titulo = capitulo.Titulo;
+            original.Contenido = capitulo.Contenido;
+            original.Palabras = capitulo.Contenido?.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length ?? 0;
+
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Capítulo editado correctamente.";
+            return RedirectToAction("Details", new { id });
+        }
+
+        // POST: Capituloes/Delete
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var capitulo = await _context.Capitulos.Include(c => c.Novela).FirstOrDefaultAsync(c => c.Id == id);
+            if (capitulo == null) return NotFound();
+
+            var usuarioNombre = HttpContext.Session.GetString("UsuarioNombre");
+            if (usuarioNombre != capitulo.Novela?.Autor?.NombreUsuario)
+                return Unauthorized();
+
+            _context.Capitulos.Remove(capitulo);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Capítulo eliminado correctamente.";
+            return RedirectToAction("Details", "Novelas", new { id = capitulo.NovelaId });
+        }
+
     }
 }

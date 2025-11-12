@@ -171,7 +171,7 @@ public partial class WebNovelasDbContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Novelas_Usuarios");
 
-            entity.HasMany(d => d.Etiqueta).WithMany(p => p.Novelas)
+            entity.HasMany(d => d.Etiquetas).WithMany(p => p.Novelas)
                 .UsingEntity<Dictionary<string, object>>(
                     "NovelaEtiqueta",
                     r => r.HasOne<Etiqueta>().WithMany()
@@ -227,28 +227,21 @@ public partial class WebNovelasDbContext : DbContext
                 .IsUnicode(false);
         });
 
-        modelBuilder.Entity<Seguimiento>(entity =>
-        {
-            entity.HasKey(e => new { e.UsuarioId, e.NovelaId });
+        modelBuilder.Entity<Seguimiento>()
+     .HasKey(s => new { s.UsuarioId, s.NovelaId }); 
 
-            entity.Property(e => e.FechaUltimaLectura)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
+        modelBuilder.Entity<Seguimiento>()
+            .HasOne(s => s.Usuario)
+            .WithMany(u => u.Seguimientos)
+            .HasForeignKey(s => s.UsuarioId)
+            .OnDelete(DeleteBehavior.Cascade);
 
-            entity.HasOne(d => d.Novela).WithMany(p => p.Seguimientos)
-                .HasForeignKey(d => d.NovelaId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Seguimientos_Novelas");
+        modelBuilder.Entity<Seguimiento>()
+            .HasOne(s => s.Novela)
+            .WithMany(n => n.Seguimientos)
+            .HasForeignKey(s => s.NovelaId)
+            .OnDelete(DeleteBehavior.Cascade);
 
-            entity.HasOne(d => d.UltimoCapituloLeido).WithMany(p => p.Seguimientos)
-                .HasForeignKey(d => d.UltimoCapituloLeidoId)
-                .HasConstraintName("FK_Seguimientos_Capitulos");
-
-            entity.HasOne(d => d.Usuario).WithMany(p => p.Seguimientos)
-                .HasForeignKey(d => d.UsuarioId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Seguimientos_Usuarios");
-        });
 
         modelBuilder.Entity<UserFollow>(entity =>
         {

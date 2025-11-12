@@ -19,14 +19,20 @@ namespace novelaweb2.Models
         public DateTime FechaPublicacion { get; set; } = DateTime.Now;
         public int AutorId { get; set; }
 
+        // 🔹 Nueva propiedad faltante
+        public int PalabrasTotales { get; set; }
+
         // 🔹 Relaciones
         public virtual Usuario Autor { get; set; } = null!;
         public virtual ICollection<Capitulo> Capitulos { get; set; } = new List<Capitulo>();
         public virtual ICollection<Reseña> Reseñas { get; set; } = new List<Reseña>();
         public virtual ICollection<Seguimiento> Seguimientos { get; set; } = new List<Seguimiento>();
 
-        // ⚠️ ESTA ES LA CLAVE: relación N:N ya configurada en tu DbContext
-        public virtual ICollection<Etiqueta> Etiqueta { get; set; } = new List<Etiqueta>();
+        // 🔹 Corregir nombre: plural para claridad y consistencia
+        public virtual ICollection<Etiqueta> Etiquetas { get; set; } = new List<Etiqueta>();
+
+        // 🔹 Agregar relación con listas
+        public virtual ICollection<ListaNovela> ListaNovelas { get; set; } = new List<ListaNovela>();
 
         // Propiedad temporal (no se guarda en BD)
         public Seguimiento? SeguimientoUsuario { get; set; }

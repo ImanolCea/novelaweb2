@@ -88,5 +88,27 @@ namespace novelaweb2.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction("Details", "Capituloes", new { id = capituloId });
         }
+        [HttpGet]
+        public async Task<IActionResult> MisBookmarks(int page = 1, int pageSize = 30)
+        {
+            var usuarioId = HttpContext.Session.GetInt32("UsuarioId");
+            if (usuarioId == null) return RedirectToAction("Login", "Auth");
+
+            var query = _context.Seguimientos
+                .Where(s => s.UsuarioId == usuarioId)
+                .Include(s => s.Novela);
+
+            var total = await query.CountAsync();
+            var items = await query
+                .OrderByDescending(s => s.FechaUltimaLectura)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(s => s.Novela)
+                .ToListAsync();
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = (int)Math.Ceiling(total / (double)pageSize);
+            return View(items);
+        }
     }
 }

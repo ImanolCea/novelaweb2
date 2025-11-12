@@ -1,94 +1,153 @@
 ﻿@model novelaweb2.Models.Capitulo
-
 @{
     ViewData["Title"] = Model.Titulo;
+    var novela = Model.Novela;
+    var usuarioNombre = Context.Session.GetString("UsuarioNombre");
+    var usuarioId = Context.Session.GetInt32("UsuarioId");
 }
 
-<section class="container mt-4">
-    <div class="card bg-dark text-light p-4 shadow">
-        <h2 class="fw-bold">@Model.Titulo</h2>
-        <p class="text-secondary mb-1">
-            Capítulo @Model.NumeroCapitulo — @Model.Novela?.Titulo
-        </p>
-        <hr />
-        <div class="mt-3" style="white-space: pre-line;">
-            @Model.Contenido
-        </div>
+<div class="reader-header d-flex align-items-center justify-content-between mb-3">
+    <div>
+        <small class="text-muted">
+            de <a asp-controller="Novelas" asp-action="Details" asp-route-id="@novela.Id" class="text-decoration-none">@novela.Titulo</a>
+        </small>
     </div>
 
-    <div class="d-flex justify-content-between mt-4">
-        @if (ViewBag.AnteriorId != null)
+    <div class="reader-controls d-flex align-items-center gap-2">
+        @{
+            var anterior = ViewBag.CapituloAnterior as novelaweb2.Models.Capitulo;
+            var siguiente = ViewBag.CapituloSiguiente as novelaweb2.Models.Capitulo;
+        }
+
+        @if (anterior != null)
         {
-            <a class="btn btn-outline-primary" href="@Url.Action("Details", "Capitulos", new { id = ViewBag.AnteriorId })">← Anterior</a>
+            <a class="btn btn-reader-nav" asp-action="Details" asp-route-id="@anterior.Id">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
         }
         else
         {
-
-            <div></div>
+            <button class="btn btn-reader-nav" disabled><i class="fa-solid fa-arrow-left"></i></button>
         }
 
-        @if (ViewBag.SiguienteId != null)
+        @if (siguiente != null)
         {
-            <a class="btn btn-outline-primary" href="@Url.Action("Details", "Capitulos", new { id = ViewBag.SiguienteId })">Siguiente →</a>
+            <a class="btn btn-reader-nav" asp-action="Details" asp-route-id="@siguiente.Id">
+                <i class="fa-solid fa-arrow-right"></i>
+            </a>
         }
+        else
+        {
+            <button class="btn btn-reader-nav" disabled><i class="fa-solid fa-arrow-right"></i></button>
+        }
+
+        <select id="fontSizeSelector" class="form-select form-select-sm reader-fontsize">
+            <option value="16">A</option>
+            <option value="18" selected>A+</option>
+            <option value="20">A++</option>
+        </select>
+
+        <button id="themeToggleBtn" class="btn-theme-toggle-reader" title="Cambiar modo claro/oscuro">
+            <i class="fa-solid fa-circle-half-stroke"></i>
+        </button>
     </div>
+</div>
 
-    <section class="comentarios mt-5">
-        <h3 class="mb-3 text-light">Comentarios</h3>
+<div class="reader-content p-4 rounded">
+    <h3 class="chapter-title mb-4">@Model.Titulo</h3>
+    <div id="chapterText" class="chapter-text">
+        @Html.Raw(Model.Contenido)
+    </div>
+</div>
 
-        @if (Model.Comentarios != null && Model.Comentarios.Any())
+<!-- Botones del autor (Editar / Eliminar) -->
+@if (usuarioNombre == novela.Autor?.NombreUsuario)
+{
+    <div class="text-center mt-3">
+        <a class="btn btn-warning me-2" asp-action="Edit" asp-route-id="@Model.Id">Editar capítulo</a>
+        <form asp-action="Delete" method="post" style="display:inline;">
+            <input type="hidden" name="id" value="@Model.Id" />
+            <button type="submit" class="btn btn-danger">Eliminar capítulo</button>
+        </form>
+    </div>
+}
+
+<!-- ===================================
+     SECCIÓN DE COMENTARIOS
+     =================================== -->
+<div class="comments-container mt-5">
+    <h4 class="mb-3 text-light">Comentarios</h4>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
+
+    <!-- Formulario de nuevo comentario -->
+    @if (usuarioId != null)
+    {
+        <form asp-controller="Comentarios" asp-action="Create" method="post" class="mb-4">
+            <input type="hidden" name="capituloId" value="@Model.Id" />
+            <textarea name="contenido" class="form-control mb-2" rows="3" placeholder="Escribe un comentario..."></textarea>
+            <button type="submit" class="btn btn-primary">Publicar</button>
+        </form>
+    }
+    else
+    {
+        <p><a asp-controller="Auth" asp-action="Login">Inicia sesión</a> para comentar.</p>
+    }
+
+    <!-- Lista de comentarios -->
+    @if (Model.Comentarios != null && Model.Comentarios.Any())
+    {
+        foreach (var c in Model.Comentarios.OrderByDescending(c => c.Fecha))
         {
-            <div class="comentarios-list">
-                @foreach (var c in Model.Comentarios.OrderByDescending(c => c.Fecha))
-                {
-                    <div class="comentario bg-dark p-3 rounded mb-3">
-                        <strong>@c.Usuario.NombreUsuario</strong>
-                        <small class="ms-2">@c.Fecha.ToString("g")</small>
-                        <p class="mt-2">@c.Contenido</p>
+            <div class="comment-item p-3 mb-2 border rounded">
+                <strong>@c.Usuario?.NombreUsuario</strong>
+                <span class="text-muted small">(@c.Fecha.ToString("dd/MM/yyyy HH:mm"))</span>
+                <p class="mt-1">@c.Contenido</p>
 
-                        @if (Context.Session.GetInt32("UsuarioId") == c.UsuarioId)
-                        {
-                            <form asp-action="Delete" asp-controller="Comentarios" method="post" class="d-inline">
-                                <input type="hidden" name="id" value="@c.Id" />
-                                <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
-                            </form>
-                        }
-                    </div>
+                @if (usuarioId == c.UsuarioId)
+                {
+                    <form asp-controller="Comentarios" asp-action="Delete" method="post" class="d-inline">
+                        <input type="hidden" name="id" value="@c.Id" />
+                        <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                    </form>
                 }
             </div>
         }
-        else
-        {
-            <p>No hay comentarios aún. Sé el primero en opinar.</p>
-        }
-
-        @if (Context.Session.GetInt32("UsuarioId") != null)
-        {
-            <form asp-action="Create" asp-controller="Comentarios" method="post" class="mt-4">
-                <input type="hidden" name="capituloId" value="@Model.Id" />
-                <div class="mb-3">
-                    <textarea name="contenido" class="form-control form-control-dark" rows="3" placeholder="Escribe tu comentario..."></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary">Comentar</button>
-            </form>
-        }
-        else
-        {
-            <p class="mt-3">Inicia sesión para comentar.</p>
-        }
-    </section>
-
+    }
+    else
+    {
+        <p class="text-muted">No hay comentarios todavía.</p>
+    }
+</div>
 
 @section Scripts {
+    <partial name="_ValidationScriptsPartial" />
     <script>
-        function showEditForm(id, contenido) {
-            document.getElementById(`comment-text-${id}`).classList.add("d-none");
-            document.getElementById(`edit-form-${id}`).classList.remove("d-none");
-        }
+        // === Tamaño de fuente ===
+        const fontSelect = document.getElementById("fontSizeSelector");
+        const textEl = document.getElementById("chapterText");
+        fontSelect.addEventListener("change", e => {
+            const size = e.target.value + "px";
+            textEl.style.fontSize = size;
+            localStorage.setItem("fontSize", size);
+        });
+        const savedFont = localStorage.getItem("fontSize");
+        if (savedFont) textEl.style.fontSize = savedFont;
 
-        function cancelEdit(id) {
-            document.getElementById(`comment-text-${id}`).classList.remove("d-none");
-            document.getElementById(`edit-form-${id}`).classList.add("d-none");
-        }
+        // === Modo claro/oscuro ===
+        const toggleBtn = document.getElementById("themeToggleBtn");
+        const body = document.body;
+        toggleBtn.addEventListener("click", () => {
+            body.classList.toggle("theme-light");
+            localStorage.setItem("theme", body.classList.contains("theme-light") ? "light" : "dark");
+        });
+        if (localStorage.getItem("theme") === "light") body.classList.add("theme-light");
     </script>
 }

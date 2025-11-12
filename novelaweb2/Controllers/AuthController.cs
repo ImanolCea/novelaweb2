@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using novelaweb2.Models;
+using novelaweb2.Models.ViewModels;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -15,33 +16,42 @@ namespace novelaweb2.Controllers
             _context = context;
         }
 
+        // =====================================================
+        // 🔹 REGISTRO
+        // =====================================================
         [HttpGet]
         public IActionResult Register() => View();
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register(string nombreUsuario, string correo, string contrasena)
+        public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            if (string.IsNullOrWhiteSpace(nombreUsuario) || string.IsNullOrWhiteSpace(correo) || string.IsNullOrWhiteSpace(contrasena))
-            {
-                ViewBag.Error = "Todos los campos son obligatorios.";
-                return View();
-            }
+            if (!ModelState.IsValid)
+                return View(model);
 
-            var existe = await _context.Usuarios.AnyAsync(u => u.Correo == correo || u.NombreUsuario == nombreUsuario);
+            bool existe = await _context.Usuarios.AnyAsync(u =>
+                u.Correo == model.Correo || u.NombreUsuario == model.NombreUsuario);
+
             if (existe)
             {
                 ViewBag.Error = "El nombre de usuario o correo ya está en uso.";
-                return View();
+                return View(model);
+            }
+
+            var rolUsuario = await _context.Roles.FirstOrDefaultAsync(r => r.Nombre == "AutorLector");
+            if (rolUsuario == null)
+            {
+                ViewBag.Error = "No se encontró el rol 'AutorLector'. Contacte al administrador.";
+                return View(model);
             }
 
             var nuevoUsuario = new Usuario
             {
-                NombreUsuario = nombreUsuario,
-                Correo = correo,
-                Contrasena = HashPassword(contrasena),
+                NombreUsuario = model.NombreUsuario,
+                Correo = model.Correo,
+                Contrasena = HashPassword(model.Contrasena),
                 FechaRegistro = DateTime.Now,
-                RolId = 2 // asegúrate que exista rol con Id = 2 (usuario)
+                RolId = rolUsuario.Id
             };
 
             _context.Usuarios.Add(nuevoUsuario);
@@ -51,8 +61,14 @@ namespace novelaweb2.Controllers
             return RedirectToAction("Login");
         }
 
+        // =====================================================
+        // 🔹 LOGIN
+        // =====================================================
         [HttpGet]
-        public IActionResult Login() => View();
+        public IActionResult Login()
+        {
+            return View();
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -60,12 +76,13 @@ namespace novelaweb2.Controllers
         {
             if (string.IsNullOrWhiteSpace(correo) || string.IsNullOrWhiteSpace(contrasena))
             {
-                ViewBag.Error = "Correo y contraseña son obligatorios.";
+                ViewBag.Error = "Debe ingresar correo y contraseña.";
                 return View();
             }
 
             var hashed = HashPassword(contrasena);
-            var usuario = await _context.Usuarios.Include(u => u.Rol)
+            var usuario = await _context.Usuarios
+                .Include(u => u.Rol)
                 .FirstOrDefaultAsync(u => u.Correo == correo && u.Contrasena == hashed);
 
             if (usuario == null)
@@ -74,19 +91,27 @@ namespace novelaweb2.Controllers
                 return View();
             }
 
-            HttpContext.Session.SetString("UsuarioNombre", usuario.NombreUsuario);
+            // Guardar sesión
             HttpContext.Session.SetInt32("UsuarioId", usuario.Id);
-            HttpContext.Session.SetString("Rol", usuario.Rol?.Nombre ?? "User");
+            HttpContext.Session.SetString("UsuarioNombre", usuario.NombreUsuario);
+            HttpContext.Session.SetString("Rol", usuario.Rol?.Nombre ?? "Usuario");
 
-            return RedirectToAction("Index", "Novelas");
+            // Redirigir al área de bookmarks
+            return RedirectToAction("MisBookmarks", "Seguimientoes");
         }
 
+        // =====================================================
+        // 🔹 LOGOUT
+        // =====================================================
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
             return RedirectToAction("Login");
         }
 
+        // =====================================================
+        // 🔹 HASH DE CONTRASEÑA
+        // =====================================================
         private string HashPassword(string input)
         {
             using var sha = SHA256.Create();

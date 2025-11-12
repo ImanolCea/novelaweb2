@@ -1,0 +1,38 @@
+﻿@model IEnumerable<novelaweb2.Models.Novela>
+@{
+    ViewData["Title"] = "Mis bookmarks";
+    var current = ViewBag.CurrentPage ?? 1;
+    var total = ViewBag.TotalPages ?? 1;
+}
+<div class="max-1200">
+    <h3 class="section-title">Mis bookmarks</h3>
+    <div class="grid">
+        @foreach (var n in Model)
+        {
+            <a class="card-novel" asp-controller="Novelas" asp-action="Details" asp-route-id="@n.Id">
+                <img class="thumb" src="@(string.IsNullOrWhiteSpace(n.PortadaUrl) ? "https://picsum.photos/400/600?grayscale" : n.PortadaUrl)" alt="@n.Titulo" />
+                <div class="meta">
+                    <h5>@n.Titulo</h5>
+                    <p>@(n.Estado)</p>
+                </div>
+            </a>
+        }
+    </div>
+
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            <li class="page-item @(current <= 1 ? "disabled" : "")">
+                <a class="page-link" asp-action="MisBookmarks" asp-route-page="@(current - 1)">Anterior</a>
+            </li>
+            @for (int p = 1; p <= total; p++)
+            {
+                <li class="page-item @(p == current ? "active" : "")">
+                    <a class="page-link" asp-action="MisBookmarks" asp-route-page="@p">@p</a>
+                </li>
+            }
+            <li class="page-item @(current >= total ? "disabled" : "")">
+                <a class="page-link" asp-action="MisBookmarks" asp-route-page="@(current + 1)">Siguiente</a>
+            </li>
+        </ul>
+    </nav>
+</div>

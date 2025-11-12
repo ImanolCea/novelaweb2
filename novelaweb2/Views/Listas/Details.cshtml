@@ -1,42 +1,36 @@
 ﻿@model novelaweb2.Models.Lista
-
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = Model.Nombre;
 }
+<div class="max-1200 text-light">
+    <h3 class="section-title">@Model.Nombre</h3>
+    <p>@Model.Descripcion</p>
 
-<h1>Details</h1>
+    @if (Model.ListaNovelas.Any())
+    {
+        <div class="grid">
+            @foreach (var ln in Model.ListaNovelas)
+            {
+                <div class="card-novel">
+                    <a asp-controller="Novelas" asp-action="Details" asp-route-id="@ln.Novela.Id">
+                        <img class="thumb" src="@(string.IsNullOrWhiteSpace(ln.Novela.PortadaUrl) ? "https://picsum.photos/400/600?grayscale" : ln.Novela.PortadaUrl)" alt="@ln.Novela.Titulo" />
+                    </a>
+                    <div class="meta">
+                        <h5>@ln.Novela.Titulo</h5>
+                        <form asp-action="EliminarNovela" method="post">
+                            <input type="hidden" name="listaId" value="@Model.Id" />
+                            <input type="hidden" name="novelaId" value="@ln.Novela.Id" />
+                            <button class="btn btn-sm btn-danger mt-2">Quitar</button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="text-muted"><em>Esta lista aún no contiene novelas.</em></p>
+    }
 
-<div>
-    <h4>Lista</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Nombre)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Nombre)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Descripcion)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Descripcion)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FechaCreacion)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FechaCreacion)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Usuario)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Usuario.Id)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="MisListas" class="btn btn-secondary mt-4">Volver</a>
 </div>

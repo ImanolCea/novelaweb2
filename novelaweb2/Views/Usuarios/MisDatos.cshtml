@@ -1,0 +1,23 @@
+﻿@model novelaweb2.Models.Usuario
+@{
+    ViewData["Title"] = "Mis datos";
+}
+<div class="max-1200">
+    <h3 class="section-title">Mis datos</h3>
+    <form method="post" asp-action="MisDatos">
+        <input type="hidden" asp-for="Id" />
+        <div class="mb-3">
+            <label class="form-label">Nombre de usuario</label>
+            <input asp-for="NombreUsuario" class="form-control form-control-dark" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Bio</label>
+            <textarea asp-for="Bio" class="form-control form-control-dark"></textarea>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">URL del avatar</label>
+            <input asp-for="AvatarUrl" class="form-control form-control-dark" />
+        </div>
+        <button class="btn btn-primary">Guardar cambios</button>
+    </form>
+</div>
