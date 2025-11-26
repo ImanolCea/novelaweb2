@@ -1,28 +1,43 @@
-@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
+@model novelaweb2.Models.Novela
 
+@{
+    ViewData["Title"] = "Detalle de novela";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
-<link rel="stylesheet" href="https://cdn.datatables.net/2.0.2/css/dataTables.dataTables.min.css">
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
-<script src="https://cdn.datatables.net/2.0.2/js/dataTables.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <div class="container mt-4">
-    <h2 class="text-center text-light mb-4">Panel de Administración</h2>
-    <div class="table-responsive">
-        <table class="table table-dark table-hover align-middle rounded">
-            <thead><tr><th>ID</th><th>Ejemplo</th></tr></thead>
-            <tbody><tr><td>1</td><td>Vista de ejemplo</td></tr></tbody>
-        </table>
+    <h2 class="text-light mb-3">📖 Detalle — @Model.Titulo</h2>
+
+    <div class="card bg-dark text-light p-3 mb-3">
+        <div class="row">
+            <div class="col-md-3 text-center">
+                <img src="@Model.PortadaUrl" class="img-fluid rounded mb-2" alt="@Model.Titulo" />
+            </div>
+            <div class="col-md-9">
+                <dl class="row">
+                    <dt class="col-sm-3">Título</dt>
+                    <dd class="col-sm-9">@Model.Titulo</dd>
+
+                    <dt class="col-sm-3">Autor</dt>
+                    <dd class="col-sm-9">@Model.Autor?.NombreUsuario</dd>
+
+                    <dt class="col-sm-3">Género</dt>
+                    <dd class="col-sm-9">@Model.Genero</dd>
+
+                    <dt class="col-sm-3">Estado</dt>
+                    <dd class="col-sm-9">@Model.Estado</dd>
+
+                    <dt class="col-sm-3">Sinopsis</dt>
+                    <dd class="col-sm-9">@Model.Sinopsis</dd>
+                </dl>
+            </div>
+        </div>
     </div>
+
+    <a asp-action="Novelas" class="btn btn-secondary">
+        <i class="fa fa-arrow-left"></i> Volver
+    </a>
+    <a asp-action="EditarNovela" asp-route-id="@Model.Id" class="btn btn-warning ms-2">
+        <i class="fa fa-edit"></i> Editar
+    </a>
 </div>
-@section Scripts {
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    new DataTable("table", {language: {url: "https://cdn.datatables.net/plug-ins/2.0.2/i18n/es-ES.json"}});
-    const success = '@TempData["Success"]';
-    const error = '@TempData["Error"]';
-    if (success) Swal.fire({icon: 'success', title: 'Éxito', text: success});
-    if (error) Swal.fire({icon: 'error', title: 'Error', text: error});
-});
-</script>
-}

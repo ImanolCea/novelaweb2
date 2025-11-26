@@ -48,26 +48,24 @@ app.UseAuthorization();
 // 🔹 RUTAS PERSONALIZADAS
 // =======================================
 
-// ✅ Ruta para novelas (permite acceder con /Novelas/Details/3)
+// Ruta para novelas (permite acceder con /Novelas/Details/3)
 app.MapControllerRoute(
     name: "novelas",
     pattern: "Novelas/{action=Details}/{id?}",
     defaults: new { controller = "Novelas" });
 
-// ✅ Ruta para capítulos (permite /Capitulos/Details/5 o /Capituloes/Details/5)
+// Ruta para capítulos (permite /Capitulos/Details/5 o /Capituloes/Details/5)
 app.MapControllerRoute(
     name: "capitulos",
     pattern: "Capitulos/{action=Details}/{id?}",
     defaults: new { controller = "Capituloes" });
 
-// ✅ Ruta principal
+//  Ruta principal
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// =======================================
-// 🔹 MANEJADOR DE ERRORES 404 AMIGABLE
-// =======================================
+
 app.Use(async (context, next) =>
 {
     await next.Invoke();

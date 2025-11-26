@@ -8,18 +8,30 @@
         <h1 class="fw-bold text-light mb-3">
             <i class="fa-solid fa-gears text-primary"></i> Panel de Administración
         </h1>
-        <p class="text-muted fs-5">
+        <p class="text-light fs-5">
             Bienvenido al panel de control. Desde aquí puedes gestionar todo el contenido del sitio.
         </p>
     </div>
 
     <div class="row g-4 justify-content-center">
+        <!-- Dashboard -->
+        <div class="col-12 col-md-4 col-lg-3">
+            <div class="admin-card card bg-dark border-secondary text-center p-4 h-100 shadow-sm">
+                <i class="fa-solid fa-chart-line fa-3x text-info mb-3"></i>
+                <h5 class="text-light fw-bold mb-2">Dashboard</h5>
+                <p class="text-light small">Visualiza métricas, gráficos y actividad del sitio.</p>
+                <a asp-controller="AdminDashboard" asp-action="Index" class="btn btn-outline-info w-100 mt-2">
+                    <i class="fa fa-arrow-right"></i> Entrar
+                </a>
+            </div>
+        </div>
+
         <!-- Usuarios -->
         <div class="col-12 col-md-4 col-lg-3">
             <div class="admin-card card bg-dark border-secondary text-center p-4 h-100 shadow-sm">
                 <i class="fa-solid fa-users fa-3x text-primary mb-3"></i>
                 <h5 class="text-light fw-bold mb-2">Usuarios</h5>
-                <p class="text-muted small">Administra las cuentas registradas.</p>
+                <p class="text-light small">Administra las cuentas registradas.</p>
                 <a asp-action="Usuarios" class="btn btn-outline-primary w-100 mt-2">
                     <i class="fa fa-arrow-right"></i> Entrar
                 </a>
@@ -31,7 +43,7 @@
             <div class="admin-card card bg-dark border-secondary text-center p-4 h-100 shadow-sm">
                 <i class="fa-solid fa-book fa-3x text-success mb-3"></i>
                 <h5 class="text-light fw-bold mb-2">Novelas</h5>
-                <p class="text-muted small">Gestiona todas las novelas publicadas.</p>
+                <p class="text-light small">Gestiona todas las novelas publicadas.</p>
                 <a asp-action="Novelas" class="btn btn-outline-success w-100 mt-2">
                     <i class="fa fa-arrow-right"></i> Entrar
                 </a>
@@ -43,7 +55,7 @@
             <div class="admin-card card bg-dark border-secondary text-center p-4 h-100 shadow-sm">
                 <i class="fa-solid fa-tags fa-3x text-info mb-3"></i>
                 <h5 class="text-light fw-bold mb-2">Etiquetas</h5>
-                <p class="text-muted small">Controla los géneros y categorías.</p>
+                <p class="text-light small">Controla los géneros y categorías.</p>
                 <a asp-action="Etiquetas" class="btn btn-outline-info w-100 mt-2">
                     <i class="fa fa-arrow-right"></i> Entrar
                 </a>
@@ -55,7 +67,7 @@
             <div class="admin-card card bg-dark border-secondary text-center p-4 h-100 shadow-sm">
                 <i class="fa-solid fa-comments fa-3x text-warning mb-3"></i>
                 <h5 class="text-light fw-bold mb-2">Comentarios</h5>
-                <p class="text-muted small">Modera los comentarios de los capítulos.</p>
+                <p class="text-light small">Modera los comentarios de los capítulos.</p>
                 <a asp-action="Comentarios" class="btn btn-outline-warning w-100 mt-2">
                     <i class="fa fa-arrow-right"></i> Entrar
                 </a>
@@ -67,7 +79,7 @@
             <div class="admin-card card bg-dark border-secondary text-center p-4 h-100 shadow-sm">
                 <i class="fa-solid fa-star fa-3x text-warning mb-3"></i>
                 <h5 class="text-light fw-bold mb-2">Reseñas</h5>
-                <p class="text-muted small">Administra las reseñas de los usuarios.</p>
+                <p class="text-light small">Administra las reseñas de los usuarios.</p>
                 <a asp-action="Resenas" class="btn btn-outline-warning w-100 mt-2">
                     <i class="fa fa-arrow-right"></i> Entrar
                 </a>
@@ -79,7 +91,7 @@
             <div class="admin-card card bg-dark border-secondary text-center p-4 h-100 shadow-sm">
                 <i class="fa-solid fa-user-shield fa-3x text-danger mb-3"></i>
                 <h5 class="text-light fw-bold mb-2">Roles</h5>
-                <p class="text-muted small">Gestiona los roles y permisos.</p>
+                <p class="text-light small">Gestiona los roles y permisos.</p>
                 <a asp-action="Roles" class="btn btn-outline-danger w-100 mt-2">
                     <i class="fa fa-arrow-right"></i> Entrar
                 </a>

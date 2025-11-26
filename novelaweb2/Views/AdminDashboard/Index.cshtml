@@ -1,0 +1,365 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4 dashboard-container">
+
+    <!-- CABECERA -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold text-light mb-1">
+                <i class="fa-solid fa-chart-line text-primary"></i> Dashboard
+            </h1>
+            <span class="dashboard-subtitle">
+                Vista general de la actividad del sitio.
+            </span>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a asp-action="ExportarExcel" class="btn btn-sm btn-success fw-bold">
+                <i class="fa-solid fa-file-excel"></i> Exportar Excel
+            </a>
+            <a asp-action="ExportarPdf" class="btn btn-sm btn-danger fw-bold">
+                <i class="fa-solid fa-file-pdf"></i> Exportar PDF
+            </a>
+        </div>
+    </div>
+
+    <!-- MÉTRICAS PRINCIPALES -->
+    <div class="row g-3 mb-3">
+        <div class="col-6 col-md-3">
+            <div class="metric-card">
+                <div class="metric-icon bg-gradient-blue">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <div class="metric-info">
+                    <div class="metric-label">Usuarios</div>
+                    <div class="metric-value">@ViewBag.TotalUsuarios</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <div class="metric-card">
+                <div class="metric-icon bg-gradient-purple">
+                    <i class="fa-solid fa-book"></i>
+                </div>
+                <div class="metric-info">
+                    <div class="metric-label">Novelas</div>
+                    <div class="metric-value">@ViewBag.TotalNovelas</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <div class="metric-card">
+                <div class="metric-icon bg-gradient-orange">
+                    <i class="fa-solid fa-file-lines"></i>
+                </div>
+                <div class="metric-info">
+                    <div class="metric-label">Capítulos</div>
+                    <div class="metric-value">@ViewBag.TotalCapitulos</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <div class="metric-card">
+                <div class="metric-icon bg-gradient-green">
+                    <i class="fa-solid fa-comments"></i>
+                </div>
+                <div class="metric-info">
+                    <div class="metric-label">Comentarios</div>
+                    <div class="metric-value">@ViewBag.TotalComentarios</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MÉTRICAS SECUNDARIAS -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="metric-card metric-card-soft">
+                <div class="metric-label-small">Usuarios activos hoy</div>
+                <div class="metric-value-small">@ViewBag.UsuariosActivosHoy</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="metric-card metric-card-soft">
+                <div class="metric-label-small">Novelas últimos 7 días</div>
+                <div class="metric-value-small">@ViewBag.NovelasUltimos7Dias</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="metric-card metric-card-soft">
+                <div class="metric-label-small">Comentarios hoy</div>
+                <div class="metric-value-small">@ViewBag.ComentariosHoy</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="metric-card metric-card-soft">
+                <div class="metric-label-small">Reseñas últimos 7 días</div>
+                <div class="metric-value-small">@ViewBag.ResenasUltimos7Dias</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- GRÁFICOS -->
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="dashboard-card p-3">
+                <h4 class="card-title">Crecimiento mensual de novelas</h4>
+                <canvas id="grafCrecimiento" style="height:280px"></canvas>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="dashboard-card p-3">
+                <h4 class="card-title">Estados de novelas</h4>
+                <canvas id="grafEstados" style="height:280px"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- LISTAS ABAJO -->
+    <div class="row g-4 mb-5">
+        <div class="col-lg-6">
+            <div class="dashboard-card p-3">
+                <h4 class="card-title">Top 5 novelas más leídas</h4>
+
+                @if (ViewBag.TopNovelas == null || ViewBag.TopNovelas.Count == 0)
+                {
+                    <p>No hay datos disponibles.</p>
+                }
+                else
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var n in ViewBag.TopNovelas)
+                        {
+                            <li class="list-group-item bg-transparent text-light d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="fw-semibold">@n.Titulo</div>
+                                    <div class="small">@n.Autor?.NombreUsuario</div>
+                                </div>
+                                <span class="badge bg-primary rounded-pill">
+                                    @n.Capitulos.Count capítulos
+                                </span>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="dashboard-card p-3">
+                <h4 class="card-title">Usuarios recientes</h4>
+
+                @if (ViewBag.Online == null || ViewBag.Online.Count == 0)
+                {
+                    <p>No hay usuarios recientes.</p>
+                }
+                else
+                {
+                    <ul class="list-group list-group-flush">
+                        @foreach (var u in ViewBag.Online)
+                        {
+                            <li class="list-group-item bg-transparent text-light d-flex justify-content-between">
+                                <span>@u.NombreUsuario</span>
+                                <span class="small">@u.FechaRegistro.ToString("dd/MM/yyyy")</span>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Datos crecimiento
+    const meses = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
+                ((IEnumerable<dynamic>)ViewBag.CrecimientoMensual).Select(x => $"{x.mes}/{x.año}")
+        ));
+
+    const valores = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
+                ((IEnumerable<dynamic>)ViewBag.CrecimientoMensual).Select(x => x.cantidad)
+        ));
+
+    new Chart(document.getElementById('grafCrecimiento'), {
+        type: 'line',
+        data: {
+            labels: meses,
+            datasets: [{
+                label: 'Novelas',
+                data: valores,
+                borderColor: '#1e90ff',
+                backgroundColor: 'rgba(30,144,255,0.18)',
+                borderWidth: 2,
+                tension: 0.35,
+                pointRadius: 4,
+                pointHoverRadius: 5
+            }]
+        },
+        options: {
+            plugins: {
+                legend: { labels: { color: '#eaeaea' } }
+            },
+            scales: {
+                x: { ticks: { color: '#cfcfcf' }, grid: { color: '#333' } },
+                y: { ticks: { color: '#cfcfcf' }, grid: { color: '#333' } }
+            }
+        }
+    });
+
+    // Datos estados
+    const estadosLabels = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
+                ((IEnumerable<dynamic>)ViewBag.EstadosNovelas).Select(x => x.estado)
+        ));
+
+    const estadosData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(
+                ((IEnumerable<dynamic>)ViewBag.EstadosNovelas).Select(x => x.cantidad)
+        ));
+
+    new Chart(document.getElementById('grafEstados'), {
+        type: 'doughnut',
+        data: {
+            labels: estadosLabels,
+            datasets: [{
+                data: estadosData,
+                backgroundColor: ['#1e90ff', '#ff6384', '#ffc107', '#4bc0c0']
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { color: '#eaeaea' }
+                }
+            }
+        }
+    });
+</script>
+
+<style>
+    .dashboard-container {
+        max-width: 1200px;
+    }
+
+    .dashboard-subtitle {
+        color: #d0d0d0;
+        font-size: 0.95rem;
+    }
+
+    .dashboard-card {
+        background: #181818;
+        border-radius: 14px;
+        border: 1px solid #333;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+    }
+
+    .metric-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #181818, #111);
+        border: 1px solid #333;
+    }
+
+    .metric-card-soft {
+        justify-content: space-between;
+    }
+
+    .metric-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 1.3rem;
+    }
+
+    .bg-gradient-blue {
+        background: linear-gradient(135deg, #1e90ff, #4b9dff);
+    }
+
+    .bg-gradient-purple {
+        background: linear-gradient(135deg, #9b59b6, #af7ac5);
+    }
+
+    .bg-gradient-orange {
+        background: linear-gradient(135deg, #e67e22, #f39c12);
+    }
+
+    .bg-gradient-green {
+        background: linear-gradient(135deg, #27ae60, #2ecc71);
+    }
+
+    .metric-info {
+        flex: 1;
+    }
+
+    .metric-label {
+        font-size: 0.85rem;
+        color: #bbbbbb;
+    }
+
+    .metric-value {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: #ffffff;
+        line-height: 1.1;
+    }
+
+    .metric-label-small {
+        font-size: 0.8rem;
+        color: #bcbcbc;
+    }
+
+    .metric-value-small {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #ffffff;
+        margin-top: 2px;
+    }
+
+    .card-title {
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 10px;
+    }
+
+    .list-group-item {
+        border-color: #333 !important;
+    }
+
+    body.theme-light .dashboard-card,
+    body.theme-light .metric-card {
+        background: #ffffff !important;
+        border-color: #dddddd !important;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    body.theme-light .metric-label,
+    body.theme-light .metric-label-small {
+        color: #555555;
+    }
+
+    body.theme-light .metric-value,
+    body.theme-light .metric-value-small {
+        color: #111111;
+    }
+
+    body.theme-light .list-group-item {
+        background: #ffffff !important;
+        color: #222 !important;
+        border-color: #e0e0e0 !important;
+    }
+</style>
