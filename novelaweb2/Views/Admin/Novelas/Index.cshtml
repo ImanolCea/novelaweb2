@@ -1,94 +1,214 @@
 @model IEnumerable<novelaweb2.Models.Novela>
 @{
-    ViewData["Title"] = "Administrar Novelas";
+    ViewData["Title"] = "Administrar novelas";
     Layout = "~/Views/Shared/_Layout.cshtml";
-}
 
-<link rel="stylesheet" href="https://cdn.datatables.net/2.0.2/css/dataTables.dataTables.min.css">
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
-<script src="https://cdn.datatables.net/2.0.2/js/dataTables.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    int page = ViewBag.CurrentPage ?? 1;
+    int pageSize = ViewBag.PageSize ?? 20;
+    int total = ViewBag.TotalItems ?? 0;
+    int totalPages = ViewBag.TotalPages ?? 1;
+
+    string search = ViewBag.Search as string ?? "";
+    string estado = ViewBag.Estado as string ?? "";
+
+    int from = total == 0 ? 0 : ((page - 1) * pageSize) + 1;
+    int to = Math.Min(page * pageSize, total);
+    var estados = ViewBag.Estados as string[] ?? new string[0];
+}
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 class="text-light fw-bold">📚 Administrar Novelas</h2>
-        <a asp-action="CrearNovela" class="btn btn-primary">
-            <i class="fa fa-plus"></i> Agregar novela
-        </a>
+        <h2 class="mb-0">
+            <i class="fa-solid fa-book"></i> Novelas
+        </h2>
+
+        <div class="d-flex gap-2">
+            <a asp-controller="Novelas" asp-action="Create"
+               class="btn btn-primary btn-sm">
+                <i class="fa fa-plus"></i> Nueva novela
+            </a>
+
+            <a asp-action="ExportarNovelasExcel"
+               asp-route-q="@search"
+               asp-route-estado="@estado"
+               class="btn btn-success btn-sm">
+                <i class="fa-solid fa-file-excel"></i> Excel
+            </a>
+
+            <a asp-action="ExportarNovelasPdf"
+               asp-route-q="@search"
+               asp-route-estado="@estado"
+               class="btn btn-danger btn-sm">
+                <i class="fa-solid fa-file-pdf"></i> PDF
+            </a>
+        </div>
     </div>
 
-    <div class="card bg-dark p-3 rounded shadow-sm">
-        <table id="novelasTable" class="table table-dark table-hover align-middle w-100">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Título</th>
-                    <th>Autor</th>
-                    <th>Género</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var novela in Model)
-                {
-                    <tr>
-                        <td>@novela.Id</td>
-                        <td>@novela.Titulo</td>
-                        <td>@novela.Autor?.NombreUsuario</td>
-                        <td>@novela.Genero</td>
-                        <td>
-                            <a asp-action="DetalleNovela" asp-route-id="@novela.Id" class="btn btn-outline-light btn-sm">
-                                <i class="fa fa-eye"></i>
-                            </a>
-                            <a asp-action="EditarNovela" asp-route-id="@novela.Id" class="btn btn-warning btn-sm">
-                                <i class="fa fa-edit"></i> Editar
-                            </a>
-                            <form asp-action="EliminarNovela" method="post" class="d-inline">
-                                <input type="hidden" name="id" value="@novela.Id" />
-                                <button type="submit" class="btn btn-danger btn-sm">
-                                    <i class="fa fa-trash"></i> Eliminar
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+    <div class="card bg-dark border-secondary">
+        <div class="card-body">
+
+            <!-- Filtros -->
+            <form method="get" class="row g-3 mb-3">
+                <div class="col-md-4 col-sm-6">
+                    <label class="form-label">Buscar</label>
+                    <input type="text" name="q" value="@search"
+                           class="form-control" placeholder="Título, género o autor" />
+                </div>
+
+                <div class="col-md-3 col-sm-6">
+                    <label class="form-label">Estado</label>
+                    <select name="estado" class="form-select">
+                        <option value="">-- Todos --</option>
+                        @foreach (var e in estados)
+                        {
+                            if (estado == e)
+                            {
+                                <option value="@e" selected="selected">@e</option>
+                            }
+                            else
+                            {
+                                <option value="@e">@e</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-2 col-sm-6">
+                    <label class="form-label">Mostrar</label>
+                    <select name="pageSize" class="form-select" onchange="this.form.submit()">
+                        @{
+                            var sizes = new[] { 10, 20, 50, 100 };
+                            foreach (var s in sizes)
+                            {
+                                if (s == pageSize)
+                                {
+                                    <option value="@s" selected="selected">@s</option>
+                                }
+                                else
+                                {
+                                    <option value="@s">@s</option>
+                                }
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-3 col-sm-6 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fa fa-search"></i> Filtrar
+                    </button>
+                </div>
+            </form>
+
+            <!-- Tabla -->
+            <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Título</th>
+                            <th>Autor</th>
+                            <th>Género</th>
+                            <th>Estado</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">
+                                No se encontraron novelas.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var n in Model)
+                        {
+                            <tr>
+                                <td>@n.Id</td>
+                                <td>@n.Titulo</td>
+                                <td>@n.Autor?.NombreUsuario</td>
+                                <td>@n.Genero</td>
+                                <td>@n.Estado</td>
+                                <td class="text-center">
+                                    <div class="btn-group" role="group">
+                                        <a asp-action="DetalleNovela"
+                                           asp-route-id="@n.Id"
+                                           class="btn btn-sm btn-outline-info">
+                                            <i class="fa fa-eye"></i>
+                                        </a>
+
+                                        <a asp-action="EditarNovela"
+                                           asp-route-id="@n.Id"
+                                           class="btn btn-sm btn-warning">
+                                            <i class="fa fa-edit"></i>
+                                        </a>
+
+                                        <a asp-action="EliminarNovela"
+                                           asp-route-id="@n.Id"
+                                           class="btn btn-sm btn-danger">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Info + paginación -->
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-3 gap-2">
+                <div>
+                    Mostrando @from a @to de @total registros
+                </div>
+
+                <nav>
+                    <ul class="pagination mb-0">
+                        <li class="page-item @(page == 1 ? "disabled" : "")">
+                            <a class="page-link"
+                               asp-action="Novelas"
+                               asp-route-page="1"
+                               asp-route-pageSize="@pageSize"
+                               asp-route-q="@search"
+                               asp-route-estado="@estado">Primero</a>
+                        </li>
+                        <li class="page-item @(page == 1 ? "disabled" : "")">
+                            <a class="page-link"
+                               asp-action="Novelas"
+                               asp-route-page="@(page - 1)"
+                               asp-route-pageSize="@pageSize"
+                               asp-route-q="@search"
+                               asp-route-estado="@estado">Anterior</a>
+                        </li>
+
+                        <li class="page-item active">
+                            <span class="page-link"></span>
+                        </li>
+
+                        <li class="page-item @(page == totalPages ? "disabled" : "")">
+                            <a class="page-link"
+                               asp-action="Novelas"
+                               asp-route-page="@(page + 1)"
+                               asp-route-pageSize="@pageSize"
+                               asp-route-q="@search"
+                               asp-route-estado="@estado">Siguiente</a>
+                        </li>
+                        <li class="page-item @(page == totalPages ? "disabled" : "")">
+                            <a class="page-link"
+                               asp-action="Novelas"
+                               asp-route-page="@totalPages"
+                               asp-route-pageSize="@pageSize"
+                               asp-route-q="@search"
+                               asp-route-estado="@estado">Último</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+        </div>
     </div>
 </div>
-
-@section Scripts {
-    <script>
-        $(document).ready(function () {
-            new DataTable('#novelasTable', {
-                language: { url: 'https://cdn.datatables.net/plug-ins/2.0.2/i18n/es-ES.json' },
-                pageLength: 10,
-                responsive: true
-            });
-
-            const success = '@TempData["Success"]';
-            const error = '@TempData["Error"]';
-            if (success)
-                Swal.fire({ icon: 'success', title: 'Éxito', text: success });
-            if (error)
-                Swal.fire({ icon: 'error', title: 'Error', text: error });
-
-            $('form').on('submit', function (e) {
-                e.preventDefault();
-                const form = this;
-                Swal.fire({
-                    title: '¿Eliminar novela?',
-                    text: 'Esta acción no se puede deshacer.',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Sí, eliminar',
-                    cancelButtonText: 'Cancelar'
-                }).then((result) => {
-                    if (result.isConfirmed) form.submit();
-                });
-            });
-        });
-    </script>
-}

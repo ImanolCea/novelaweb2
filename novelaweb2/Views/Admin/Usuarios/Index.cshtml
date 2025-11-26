@@ -1,89 +1,215 @@
 @model IEnumerable<novelaweb2.Models.Usuario>
-
 @{
     ViewData["Title"] = "Administrar usuarios";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    int page = ViewBag.Page ?? 1;
+    int pageSize = ViewBag.PageSize ?? 10;
+    int total = ViewBag.Total ?? 0;
+    int totalPages = ViewBag.TotalPages ?? 1;
+
+    string search = ViewBag.Search as string ?? "";
+    int? rolId = ViewBag.RolId as int?;
+    var roles = ViewBag.Roles as List<novelaweb2.Models.Role> ?? new();
+
+    int from = total == 0 ? 0 : ((page - 1) * pageSize) + 1;
+    int to = Math.Min(page * pageSize, total);
 }
 
 <div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold text-light mb-0">
-            <i class="fa-solid fa-users me-2"></i> Usuarios
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">
+            <i class="fa-solid fa-users"></i> Usuarios
         </h2>
 
-        <a asp-controller="Usuarios" asp-action="Create" class="btn btn-primary">
-            <i class="fa fa-plus me-1"></i> Nuevo usuario
-        </a>
+        <div class="d-flex gap-2">
+            <a asp-controller="Usuarios" asp-action="Create"
+               class="btn btn-primary btn-sm">
+                <i class="fa fa-plus"></i> Nuevo usuario
+            </a>
+
+            <a asp-action="ExportUsuariosExcel"
+               asp-route-search="@search"
+               asp-route-rolId="@rolId"
+               class="btn btn-success btn-sm">
+                <i class="fa-solid fa-file-excel"></i> Excel
+            </a>
+
+            <a asp-action="ExportUsuariosPdf"
+               asp-route-search="@search"
+               asp-route-rolId="@rolId"
+               class="btn btn-danger btn-sm">
+                <i class="fa-solid fa-file-pdf"></i> PDF
+            </a>
+        </div>
     </div>
 
-    <div class="card bg-dark border-secondary shadow-sm">
-        <div class="table-responsive">
-            <table class="table table-dark table-hover align-middle mb-0">
-                <thead>
-                    <tr>
-                        <th>Id</th>
-                        <th>Nombre de usuario</th>
-                        <th>Email</th>
-                        <th>Rol</th>
-                        <th class="text-center" style="width:180px;">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var u in Model)
+    <div class="card bg-dark border-secondary">
+        <div class="card-body">
+
+            <!-- Filtros -->
+            <form method="get" class="row g-3 mb-3">
+                <div class="col-md-3 col-sm-6">
+                    <label class="form-label">Buscar</label>
+                    <input type="text" name="search" value="@search"
+                           class="form-control" placeholder="Nombre o email" />
+                </div>
+
+                <div class="col-md-3 col-sm-6">
+                    <label class="form-label">Rol</label>
+                    <select name="rolId" class="form-select">
+                        <option value="">-- Todos --</option>
+                        @foreach (var r in roles)
+                        {
+                            if (rolId == r.Id)
+                            {
+                                <option value="@r.Id" selected="selected">@r.Nombre</option>
+                            }
+                            else
+                            {
+                                <option value="@r.Id">@r.Nombre</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-3 col-sm-6">
+                    <label class="form-label">Mostrar</label>
+                    <select name="pageSize" class="form-select" onchange="this.form.submit()">
+                        @{
+                            var sizes = new[] { 10, 25, 50, 100 };
+                            foreach (var s in sizes)
+                            {
+                                if (s == pageSize)
+                                {
+                                    <option value="@s" selected="selected">@s</option>
+                                }
+                                else
+                                {
+                                    <option value="@s">@s</option>
+                                }
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-3 col-sm-6 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fa fa-search"></i> Filtrar
+                    </button>
+                </div>
+            </form>
+
+            <!-- Tabla -->
+            <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Nombre de usuario</th>
+                            <th>Email</th>
+                            <th>Rol</th>
+                            <th class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @if (!Model.Any())
                     {
                         <tr>
-                            <td>@u.Id</td>
-                            <td>@u.NombreUsuario</td>
-                            <td>@u.Correo</td>
-                            <td>@u.Rol?.Nombre</td>
-                            <td class="text-center">
-                                <div class="btn-group" role="group">
-                                    <a asp-controller="Usuarios" asp-action="Details" asp-route-id="@u.Id"
-                                       class="btn btn-sm btn-outline-light" title="Detalles">
-                                        <i class="fa fa-eye"></i>
-                                    </a>
-                                    <a asp-controller="Usuarios" asp-action="Edit" asp-route-id="@u.Id"
-                                       class="btn btn-sm btn-outline-warning" title="Editar">
-                                        <i class="fa fa-edit"></i>
-                                    </a>
-
-                                    <form asp-action="EliminarUsuario" method="post" class="d-inline frm-delete-usuario">
-                                        <input type="hidden" name="id" value="@u.Id" />
-                                        <button type="submit" class="btn btn-sm btn-danger" title="Eliminar">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                    </form>
-                                </div>
+                            <td colspan="5" class="text-center text-muted">
+                                No se encontraron usuarios.
                             </td>
                         </tr>
                     }
-                </tbody>
-            </table>
+                    else
+                    {
+                        foreach (var u in Model)
+                        {
+                            <tr>
+                                <td>@u.Id</td>
+                                <td>@u.NombreUsuario</td>
+                                <td>@u.Correo</td>
+                                <td>@u.Rol?.Nombre</td>
+                                <td class="text-center">
+                                    <div class="btn-group" role="group">
+                                        <a asp-controller="Usuarios" asp-action="Details"
+                                           asp-route-id="@u.Id"
+                                           class="btn btn-sm btn-outline-info">
+                                            <i class="fa fa-eye"></i>
+                                        </a>
+
+                                        <a asp-controller="Usuarios" asp-action="Edit"
+                                           asp-route-id="@u.Id"
+                                           class="btn btn-sm btn-warning">
+                                            <i class="fa fa-edit"></i>
+                                        </a>
+
+                                        <form asp-action="EliminarUsuario" method="post"
+                                              class="d-inline"
+                                              onsubmit="return confirm('¿Eliminar este usuario?');">
+                                            <input type="hidden" name="id" value="@u.Id" />
+                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Info + paginación -->
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-3 gap-2">
+                <div>
+                    Mostrando @from a @to de @total registros
+                </div>
+
+                <nav>
+                    <ul class="pagination mb-0">
+                        <li class="page-item @(page == 1 ? "disabled" : "")">
+                            <a class="page-link"
+                               asp-action="Usuarios"
+                               asp-route-page="1"
+                               asp-route-pageSize="@pageSize"
+                               asp-route-search="@search"
+                               asp-route-rolId="@rolId">Primero</a>
+                        </li>
+                        <li class="page-item @(page == 1 ? "disabled" : "")">
+                            <a class="page-link"
+                               asp-action="Usuarios"
+                               asp-route-page="@(page - 1)"
+                               asp-route-pageSize="@pageSize"
+                               asp-route-search="@search"
+                               asp-route-rolId="@rolId">Anterior</a>
+                        </li>
+
+                        <li class="page-item active">
+                            <span class="page-link"></span>
+                        </li>
+
+                        <li class="page-item @(page == totalPages ? "disabled" : "")">
+                            <a class="page-link"
+                               asp-action="Usuarios"
+                               asp-route-page="@(page + 1)"
+                               asp-route-pageSize="@pageSize"
+                               asp-route-search="@search"
+                               asp-route-rolId="@rolId">Siguiente</a>
+                        </li>
+                        <li class="page-item @(page == totalPages ? "disabled" : "")">
+                            <a class="page-link"
+                               asp-action="Usuarios"
+                               asp-route-page="@totalPages"
+                               asp-route-pageSize="@pageSize"
+                               asp-route-search="@search"
+                               asp-route-rolId="@rolId">Último</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
         </div>
     </div>
 </div>
-
-@section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        document.querySelectorAll('.frm-delete-usuario').forEach(form => {
-            form.addEventListener('submit', function (e) {
-                e.preventDefault();
-                Swal.fire({
-                    title: '¿Eliminar usuario?',
-                    text: 'Esta acción no se puede deshacer.',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: 'Sí, eliminar',
-                    cancelButtonText: 'Cancelar'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        form.submit();
-                    }
-                });
-            });
-        });
-    </script>
-}
