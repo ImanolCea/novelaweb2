@@ -21,6 +21,7 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromDays(7);
 });
 
+
 // =======================================
 // 🔹 MVC
 // =======================================
